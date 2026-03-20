@@ -13,9 +13,8 @@ import { churchMember } from "./secretariat";
 import { relations } from "drizzle-orm";
 
 export const bank = pgTable("bank", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  id: integer("id").primaryKey(),
   name: text("name").notNull(),
-  code: text("code").notNull().unique(),
   logoUrl: text("logo_url"),
 });
 

@@ -3,8 +3,8 @@ import { permission } from "./schema/organization";
 import { bank } from "./schema/treasury";
 
 interface Bank {
+  code: number;
   name: string;
-  code: number | null;
   logoUrl?: string;
 }
 
@@ -18,8 +18,9 @@ const banks = async () => {
     return data
       .filter((bank: Bank) => bank.code !== null)
       .map((bank: Bank) => ({
+        id: bank.code,
         name: bank.name,
-        code: bank.code,
+        logoUrl: bank.logoUrl,
       }));
   } catch (error) {
     console.error("Error getting banks:", error);
