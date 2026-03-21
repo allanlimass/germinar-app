@@ -16,7 +16,6 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 
 import * as z from "zod";
 
@@ -25,9 +24,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "../ui/input-group";
+import {
+  EyeIcon,
+  KeyRoundIcon,
+  Loader2Icon,
+  MailIcon,
+  UserIcon,
+} from "lucide-react";
 
 const registerSchema = z.object({
-  name: z.string().trim().min(1, { message: "Nome é obrigatório" }),
+  firstName: z.string().trim().min(1, { message: "Nome é obrigatório" }),
+  lastName: z.string().trim().min(1, { message: "Sobrenome é obrigatório" }),
   email: z.string().trim().min(1, { message: "Email é obrigatório" }).email({
     message: "Email inválido",
   }),
@@ -44,25 +57,22 @@ export function RegisterForm() {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (values: RegisterFormValues) => {
+  const onSubmit = async () => {
     await authClient.signUp.email(
       {
-        name: values.name,
-        email: values.email,
-        password: values.password,
+        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        email: form.getValues("email"),
+        password: form.getValues("password"),
         callbackURL: "/dashboard",
       },
       {
-        onSuccess: () => {
-          toast.success("Conta criada com sucesso!");
-          router.push("/dashboard");
-        },
         onError: (ctx) => {
           if (ctx.error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL") {
             toast.error("Usuário já cadastrado. Use outro e-mail");
@@ -70,22 +80,24 @@ export function RegisterForm() {
           }
           toast.error("Erro ao criar conta.");
         },
+        onSuccess: () => {
+          toast.success("Conta criada com sucesso!");
+          router.push("/dashboard");
+        },
       },
     );
   };
 
   return (
-    <div className={"flex flex-col gap-6"}>
+    <div className={"flex flex-col gap-4"}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Registre-se</CardTitle>
-          <CardDescription>
-            Registre-se com sua conta Apple ou Google
-          </CardDescription>
+          <CardDescription>Registre-se com sua conta</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup>
+            <FieldGroup className="gap-4">
               <Field>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -97,23 +109,54 @@ export function RegisterForm() {
                   Registrar com Google
                 </Button>
               </Field>
+
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Ou continue com
+                ou
               </FieldSeparator>
 
               <Controller
-                name="name"
+                name="firstName"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Nome</FieldLabel>
-                    <Input
-                      id={field.name}
-                      type="text"
-                      placeholder="Seu nome"
-                      required
-                      {...field}
-                    />
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type="text"
+                        placeholder="Seu primeiro nome"
+                        required
+                        {...field}
+                      />
+                      <InputGroupAddon>
+                        <UserIcon />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="lastName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>Sobrenome</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type="text"
+                        placeholder="Seu sobrenome"
+                        required
+                        {...field}
+                      />
+                      <InputGroupAddon>
+                        <UserIcon />
+                      </InputGroupAddon>
+                    </InputGroup>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -127,13 +170,18 @@ export function RegisterForm() {
                 render={({ field, fieldState }) => (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
-                      id={field.name}
-                      type="email"
-                      placeholder="johndoe@gmail.com"
-                      required
-                      {...field}
-                    />
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type="email"
+                        placeholder="Digite seu email"
+                        required
+                        {...field}
+                      />
+                      <InputGroupAddon>
+                        <MailIcon />
+                      </InputGroupAddon>
+                    </InputGroup>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -149,13 +197,21 @@ export function RegisterForm() {
                     <div className="flex items-center">
                       <FieldLabel htmlFor={field.name}>Senha</FieldLabel>
                     </div>
-                    <Input
-                      id={field.name}
-                      type="password"
-                      placeholder="Digite sua senha"
-                      required
-                      {...field}
-                    />
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type="password"
+                        placeholder="Digite sua senha"
+                        required
+                        {...field}
+                      />
+                      <InputGroupAddon>
+                        <KeyRoundIcon />
+                      </InputGroupAddon>
+                      <InputGroupButton>
+                        <EyeIcon />
+                      </InputGroupButton>
+                    </InputGroup>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -165,7 +221,11 @@ export function RegisterForm() {
 
               <Field>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Registrando..." : "Registrar"}
+                  {form.formState.isSubmitting ? (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Registrar"
+                  )}
                 </Button>
                 <FieldDescription className="text-center">
                   Já tem uma conta? <a href="/login">Faça login</a>
@@ -176,7 +236,7 @@ export function RegisterForm() {
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        Ao clicar em continuar, você concorda com nossos{" "}
+        Ao clicar em registrar, você concorda com nossos{" "}
         <a href="#">Termos de Serviço</a> e{" "}
         <a href="#">Política de Privacidade</a>.
       </FieldDescription>
