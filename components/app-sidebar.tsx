@@ -43,7 +43,7 @@ const data = {
     {
       title: "Diretoria",
       url: "#",
-      icon: <TerminalSquareIcon />,
+      icon: TerminalSquareIcon,
       isActive: true,
       items: [
         {
@@ -63,7 +63,7 @@ const data = {
     {
       title: "Secretaria",
       url: "#",
-      icon: <BotIcon />,
+      icon: BotIcon,
       items: [
         {
           title: "Dashboard",
@@ -82,54 +82,54 @@ const data = {
     {
       title: "Tesouraria",
       url: "#",
-      icon: <HandCoinsIcon />,
+      icon: HandCoinsIcon,
       items: [
         {
           title: "Dashboard",
           url: "#",
-          icon: <LayoutDashboardIcon />,
+          icon: LayoutDashboardIcon,
         },
         {
           title: "Recebimentos",
           url: "#",
-          icon: <ArrowUpIcon />,
+          icon: ArrowUpIcon,
         },
         {
           title: "Pagamentos",
           url: "#",
-          icon: <ArrowDownIcon />,
+          icon: ArrowDownIcon,
         },
         {
           title: "Planos de Contas",
           url: "#",
-          icon: <ListIcon />,
+          icon: ListIcon,
         },
         {
           title: "Centros de Custos",
           url: "#",
-          icon: <InboxIcon />,
+          icon: InboxIcon,
         },
         {
           title: "Contas Bancárias",
           url: "#",
-          icon: <LandmarkIcon />,
+          icon: LandmarkIcon,
         },
         {
           title: "Fornecedores",
           url: "#",
-          icon: <StoreIcon />,
+          icon: StoreIcon,
         },
         {
           title: "Relatórios",
           url: "#",
-          icon: <FileSpreadsheetIcon />,
+          icon: FileSpreadsheetIcon,
         },
       ],
     },
     {
       title: "Documentation",
       url: "#",
-      icon: <BookOpenIcon />,
+      icon: BookOpenIcon,
       items: [
         {
           title: "Introduction",
@@ -152,7 +152,7 @@ const data = {
     {
       title: "Settings",
       url: "#",
-      icon: <Settings2Icon />,
+      icon: Settings2Icon,
       items: [
         {
           title: "General",
@@ -177,29 +177,29 @@ const data = {
     {
       name: "Design Engineering",
       url: "#",
-      icon: <FrameIcon />,
+      icon: FrameIcon,
     },
     {
       name: "Sales & Marketing",
       url: "#",
-      icon: <PieChartIcon />,
+      icon: PieChartIcon,
     },
     {
       name: "Travel",
       url: "#",
-      icon: <MapIcon />,
+      icon: MapIcon,
     },
   ],
   navSecondary: [
     {
       title: "Suporte",
       url: "#",
-      icon: <LifeBuoyIcon />,
+      icon: LifeBuoyIcon,
     },
     {
       title: "Feedback",
       url: "#",
-      icon: <SendIcon />,
+      icon: SendIcon,
     },
   ],
 };

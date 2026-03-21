@@ -25,12 +25,12 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon: React.ReactNode;
+    icon?: React.ElementType;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
-      icon: React.ReactNode;
+      icon?: React.ElementType;
     }[];
   }[];
 }) {
@@ -43,7 +43,7 @@ export function NavMain({
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
                 <Link href={item.url}>
-                  {item.icon}
+                  {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
@@ -61,7 +61,7 @@ export function NavMain({
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
                             <Link href={subItem.url}>
-                              {subItem.icon}
+                              {subItem.icon && <subItem.icon />}
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
