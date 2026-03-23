@@ -9,17 +9,31 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  const isPublicRoute = pathname === "/login" || pathname === "/register";
+  const isAuthRoute = pathname === "/login" || pathname === "/register";
+  const isOnboardingRoute = pathname.startsWith("/onboarding");
+  const isPrivateRoute = pathname.startsWith("/dashboard");
 
-  if (isPublicRoute && session)
+  const hasSession = !!session;
+  const hasOrganization = !!session?.session?.activeOrganizationId;
+
+  if (isAuthRoute && hasSession && hasOrganization)
     return NextResponse.redirect(new URL("/dashboard", request.url));
 
-  if (!isPublicRoute && !session)
+  if (isAuthRoute && hasSession && !hasOrganization)
+    return NextResponse.redirect(new URL("/onboarding", request.url));
+
+  if ((isPrivateRoute || isOnboardingRoute) && !hasSession)
     return NextResponse.redirect(new URL("/login", request.url));
+
+  if (isPrivateRoute && hasSession && !hasOrganization)
+    return NextResponse.redirect(new URL("/onboarding", request.url));
+
+  if (isOnboardingRoute && hasSession && hasOrganization)
+    return NextResponse.redirect(new URL("/dashboard", request.url));
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/login", "/register", "/onboarding"],
 };

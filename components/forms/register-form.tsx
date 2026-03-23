@@ -14,7 +14,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field";
 
 import * as z from "zod";
@@ -37,6 +36,7 @@ import {
   MailIcon,
   UserIcon,
 } from "lucide-react";
+import Link from "next/link";
 
 const registerSchema = z.object({
   firstName: z.string().trim().min(1, { message: "Nome é obrigatório" }),
@@ -64,12 +64,12 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = async (values: RegisterFormValues) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     await authClient.signUp.email(
       {
-        name: `${values.firstName} ${values.lastName}`,
-        email: values.email,
-        password: values.password,
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        password: data.password,
         callbackURL: "/dashboard",
       },
       {
@@ -212,7 +212,7 @@ export function RegisterForm() {
                   )}
                 </Button>
                 <FieldDescription className="text-center">
-                  Já tem uma conta? <a href="/login">Faça login</a>
+                  Já tem uma conta? <Link href="/login">Faça login</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -221,8 +221,8 @@ export function RegisterForm() {
       </Card>
       <FieldDescription className="px-6 text-center">
         Ao clicar em registrar, você concorda com nossos{" "}
-        <a href="#">Termos de Serviço</a> e{" "}
-        <a href="#">Política de Privacidade</a>.
+        <Link href="#">Termos de Serviço</Link> e{" "}
+        <Link href="#">Política de Privacidade</Link>.
       </FieldDescription>
     </div>
   );

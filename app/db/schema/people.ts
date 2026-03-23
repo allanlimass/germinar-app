@@ -50,6 +50,7 @@ export const churchMember = pgTable(
     churchRoleId: text("church_role_id").references(() => churchRole.id, {
       onDelete: "set null",
     }),
+    type: text("type").notNull().default("visitor"),
     name: text("name").notNull(),
     birthDate: timestamp("birth_date"),
     gender: text("gender"),

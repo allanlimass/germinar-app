@@ -1,4 +1,5 @@
 import {
+  boolean,
   foreignKey,
   index,
   integer,
@@ -9,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { branch } from "./organization";
-import { churchMember } from "./secretariat";
+import { churchMember } from "./people";
 import { relations } from "drizzle-orm";
 
 export const bank = pgTable("bank", {
@@ -25,7 +26,9 @@ export const financeAccount = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: text("branch_id").references(() => branch.id),
+    branchId: text("branch_id")
+      .notNull()
+      .references(() => branch.id),
     bankId: integer("bank_id").references(() => bank.id),
     name: text("name").notNull(),
     agency: text("agency"),
@@ -84,19 +87,14 @@ export const financeCostCenter = pgTable(
   (table) => [index("cost_center_organizationId_idx").on(table.organizationId)],
 );
 
-export const financePerson = pgTable(
-  "finance_person",
+export const financeSupplier = pgTable(
+  "finance_supplier",
   {
     id: text("id").primaryKey(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: text("branch_id").references(() => branch.id),
-    churchMemberId: text("church_member_id").references(() => churchMember.id, {
-      onDelete: "set null",
-    }),
-    type: text("type").notNull(),
-    personType: text("person_type").notNull(),
+    isCompany: boolean("is_company").default(false).notNull(),
     name: text("name").notNull(),
     companyName: text("company_name"),
     fantasyName: text("fantasy_name"),
@@ -117,10 +115,7 @@ export const financePerson = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [
-    index("person_organizationId_idx").on(table.organizationId),
-    index("person_churchMemberId_idx").on(table.churchMemberId),
-  ],
+  (table) => [index("person_organizationId_idx").on(table.organizationId)],
 );
 
 export const financeTransaction = pgTable(
@@ -130,18 +125,23 @@ export const financeTransaction = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: text("branch_id").references(() => branch.id),
+    branchId: text("branch_id")
+      .notNull()
+      .references(() => branch.id),
     financeAccountId: text("finance_account_id")
       .notNull()
       .references(() => financeAccount.id),
     financeChartOfAccountId: text("finance_chart_of_account_id")
       .notNull()
       .references(() => financeChartOfAccounts.id),
-    financePersonId: text("finance_person_id").references(
-      () => financePerson.id,
-    ),
     financeCostCenterId: text("finance_cost_center_id").references(
       () => financeCostCenter.id,
+    ),
+    financeSupplierId: text("finance_supplier_id").references(
+      () => financeSupplier.id,
+    ),
+    financeContributorId: text("finance_contributor_id").references(
+      () => churchMember.id,
     ),
     type: text("type").notNull(),
     amount: numeric("amount").notNull(),
@@ -166,7 +166,10 @@ export const financeTransaction = pgTable(
       table.financeChartOfAccountId,
     ),
     index("transaction_financeCostCenterId_idx").on(table.financeCostCenterId),
-    index("transaction_financePersonId_idx").on(table.financePersonId),
+    index("transaction_financeSupplierId_idx").on(table.financeSupplierId),
+    index("transaction_financeContributorId_idx").on(
+      table.financeContributorId,
+    ),
     index("transaction_createdBy_idx").on(table.createdBy),
   ],
 );
@@ -204,9 +207,13 @@ export const financeTransactionRelations = relations(
       fields: [financeTransaction.financeChartOfAccountId],
       references: [financeChartOfAccounts.id],
     }),
-    financePerson: one(financePerson, {
-      fields: [financeTransaction.financePersonId],
-      references: [financePerson.id],
+    financeSupplier: one(financeSupplier, {
+      fields: [financeTransaction.financeSupplierId],
+      references: [financeSupplier.id],
+    }),
+    financeContributor: one(churchMember, {
+      fields: [financeTransaction.financeContributorId],
+      references: [churchMember.id],
     }),
     financeCostCenter: one(financeCostCenter, {
       fields: [financeTransaction.financeCostCenterId],
@@ -255,20 +262,12 @@ export const financeChartOfAccountsRelations = relations(
   }),
 );
 
-export const financePersonRelations = relations(
-  financePerson,
+export const financeSupplierRelations = relations(
+  financeSupplier,
   ({ one, many }) => ({
     organization: one(organization, {
-      fields: [financePerson.organizationId],
+      fields: [financeSupplier.organizationId],
       references: [organization.id],
-    }),
-    branch: one(branch, {
-      fields: [financePerson.branchId],
-      references: [branch.id],
-    }),
-    churchMember: one(churchMember, {
-      fields: [financePerson.churchMemberId],
-      references: [churchMember.id],
     }),
     transactions: many(financeTransaction),
   }),

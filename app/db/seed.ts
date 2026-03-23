@@ -1,6 +1,6 @@
 import { db } from "./index";
 import { permission } from "./schema/organization";
-import { bank } from "./schema/treasury";
+import { bank } from "./schema/finance";
 
 interface Bank {
   code: number;
@@ -28,13 +28,7 @@ const banks = async () => {
   }
 };
 
-const MODULES = [
-  "members",
-  "secretariat",
-  "finance",
-  "events",
-  "communications",
-];
+const MODULES = ["people", "finance"];
 const ACTIONS = ["create", "read", "update", "delete"];
 
 const permissions = MODULES.flatMap((module) =>
@@ -47,11 +41,11 @@ const permissions = MODULES.flatMap((module) =>
 );
 
 const seed = async () => {
+  await db.insert(permission).values(permissions).onConflictDoNothing();
   await db
     .insert(bank)
     .values(await banks())
     .onConflictDoNothing();
-  await db.insert(permission).values(permissions).onConflictDoNothing();
 };
 
 seed()

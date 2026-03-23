@@ -4,6 +4,7 @@ import {
   timestamp,
   primaryKey,
   index,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { relations } from "drizzle-orm";
@@ -12,10 +13,19 @@ export const branch = pgTable(
   "branch",
   {
     id: text("id").primaryKey(),
+    isHeadquarters: boolean("is_headquarters").default(false).notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
+    phone: text("phone"),
+    email: text("email"),
+    zipCode: text("zip_code"),
+    street: text("street"),
+    number: text("number"),
+    neighborhood: text("neighborhood"),
+    city: text("city"),
+    state: text("state"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

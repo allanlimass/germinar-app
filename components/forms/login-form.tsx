@@ -17,7 +17,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 
-import * as z from "zod";
+import z from "zod";
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +32,7 @@ import {
   InputGroupInput,
 } from "../ui/input-group";
 import { Checkbox } from "../ui/checkbox";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z.string().trim().min(1, { message: "Email é obrigatório" }).email({
@@ -57,12 +58,12 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     await authClient.signIn.email(
       {
-        email: values.email,
-        password: values.password,
-        rememberMe: values.rememberMe,
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe,
         callbackURL: "/dashboard",
       },
       {
@@ -199,12 +200,12 @@ export function LoginForm() {
                     </Field>
                   )}
                 />
-                <a
+                <Link
                   href="/forgot-password"
                   className="text-sm underline-offset-4 hover:underline"
                 >
                   Esqueceu sua senha?
-                </a>
+                </Link>
               </div>
               <Field className="flex flex-col gap-4">
                 <Button type="submit" disabled={form.formState.isSubmitting}>
@@ -225,8 +226,8 @@ export function LoginForm() {
       </Card>
       <FieldDescription className="px-6 text-center">
         Ao clicar em continuar, você concorda com nossos{" "}
-        <a href="#">Termos de Serviço</a> e{" "}
-        <a href="#">Política de Privacidade</a>.
+        <Link href="#">Termos de Serviço</Link> e{" "}
+        <Link href="#">Política de Privacidade</Link>.
       </FieldDescription>
     </div>
   );
