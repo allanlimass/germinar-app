@@ -33,7 +33,6 @@ const ACTIONS = ["create", "read", "update", "delete"];
 
 const permissions = MODULES.flatMap((module) =>
   ACTIONS.map((action) => ({
-    id: `${module}_${action}`,
     module,
     action,
     description: `Allows ${action}ing ${module}.`,

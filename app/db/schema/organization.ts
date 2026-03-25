@@ -5,6 +5,7 @@ import {
   primaryKey,
   index,
   boolean,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { relations } from "drizzle-orm";
@@ -12,7 +13,7 @@ import { relations } from "drizzle-orm";
 export const branch = pgTable(
   "branch",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     isHeadquarters: boolean("is_headquarters").default(false).notNull(),
     organizationId: text("organization_id")
       .notNull()
@@ -38,8 +39,8 @@ export const branch = pgTable(
 export const branchMember = pgTable(
   "branch_member",
   {
-    id: text("id").primaryKey(),
-    branchId: text("branch_id")
+    id: uuid("id").primaryKey().defaultRandom(),
+    branchId: uuid("branch_id")
       .notNull()
       .references(() => branch.id, { onDelete: "cascade" }),
     userId: text("user_id")
@@ -59,7 +60,7 @@ export const branchMember = pgTable(
 );
 
 export const permission = pgTable("permission", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   module: text("module").notNull(),
   action: text("action").notNull(),
   description: text("description").notNull(),
@@ -68,10 +69,10 @@ export const permission = pgTable("permission", {
 export const branchMemberPermission = pgTable(
   "branch_member_permission",
   {
-    branchMemberId: text("branch_member_id")
+    branchMemberId: uuid("branch_member_id")
       .notNull()
       .references(() => branchMember.id, { onDelete: "cascade" }),
-    permissionId: text("permission_id")
+    permissionId: uuid("permission_id")
       .notNull()
       .references(() => permission.id, { onDelete: "cascade" }),
   },

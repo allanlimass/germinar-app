@@ -28,17 +28,17 @@ import z from "zod";
 
 import { slugify } from "@/lib/utils/slugify";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-const organizationFormSchema = z.object({
-  name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  slug: z.string().min(3, "Subdomínio deve ter pelo menos 3 caracteres"),
-});
+import { useRouter } from "next/navigation";
+import { organizationFormSchema } from "@/validators/organization";
 
 type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
 
-export default function OrganizationForm() {
+interface OrganizationFormProps {
+  onSuccess: (organizationId: string) => void;
+}
+
+export default function OrganizationForm({ onSuccess }: OrganizationFormProps) {
   const router = useRouter();
 
   const form = useForm<OrganizationFormValues>({
@@ -59,6 +59,11 @@ export default function OrganizationForm() {
     });
   };
 
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.push("/login");
+  };
+
   const onSubmit = async (data: OrganizationFormValues) => {
     await authClient.organization.create(
       {
@@ -66,9 +71,19 @@ export default function OrganizationForm() {
         slug: data.slug,
       },
       {
-        onSuccess: () => {
+        onSuccess: async (ctx) => {
+          const organizationId = ctx.data?.id;
+
+          if (!organizationId) {
+            toast.error("Erro ao criar organização");
+            return;
+          }
+
+          await authClient.organization.setActive({
+            organizationId,
+          });
           toast.success("Organização criada com sucesso!");
-          router.push("/dashboard");
+          onSuccess(organizationId);
         },
         onError: (ctx) => {
           toast.error(ctx.error.message);
@@ -138,8 +153,12 @@ export default function OrganizationForm() {
 
               <div className="flex flex-row justify-between gap-4">
                 <Field>
-                  <Button type="button" variant="outline">
-                    Cancelar
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleLogout}
+                  >
+                    Sair
                   </Button>
                 </Field>
 

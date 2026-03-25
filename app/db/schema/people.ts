@@ -4,6 +4,7 @@ import {
   timestamp,
   primaryKey,
   index,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { branch } from "./organization";
@@ -12,7 +13,7 @@ import { relations } from "drizzle-orm";
 export const churchRole = pgTable(
   "church_role",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -26,7 +27,7 @@ export const churchRole = pgTable(
 export const churchFunction = pgTable(
   "church_function",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -42,12 +43,12 @@ export const churchFunction = pgTable(
 export const churchMember = pgTable(
   "church_member",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
-    churchRoleId: text("church_role_id").references(() => churchRole.id, {
+    churchRoleId: uuid("church_role_id").references(() => churchRole.id, {
       onDelete: "set null",
     }),
     type: text("type").notNull().default("visitor"),
@@ -84,10 +85,10 @@ export const churchMember = pgTable(
 export const churchMemberFunction = pgTable(
   "church_member_function",
   {
-    memberId: text("member_id")
+    memberId: uuid("member_id")
       .notNull()
       .references(() => churchMember.id, { onDelete: "cascade" }),
-    functionId: text("function_id")
+    functionId: uuid("function_id")
       .notNull()
       .references(() => churchFunction.id, { onDelete: "cascade" }),
     assignedAt: timestamp("assigned_at").defaultNow().notNull(),
@@ -102,11 +103,11 @@ export const churchMemberFunction = pgTable(
 export const churchMemberBranch = pgTable(
   "church_member_branch",
   {
-    id: text("id").primaryKey(),
-    memberId: text("member_id")
+    id: uuid("id").primaryKey().defaultRandom(),
+    memberId: uuid("member_id")
       .notNull()
       .references(() => churchMember.id, { onDelete: "cascade" }),
-    branchId: text("branch_id")
+    branchId: uuid("branch_id")
       .notNull()
       .references(() => branch.id, { onDelete: "cascade" }),
     joinedAt: timestamp("joined_at").defaultNow().notNull(),
@@ -121,8 +122,8 @@ export const churchMemberBranch = pgTable(
 export const churchMemberEvent = pgTable(
   "church_member_event",
   {
-    id: text("id").primaryKey(),
-    memberId: text("member_id")
+    id: uuid("id").primaryKey().defaultRandom(),
+    memberId: uuid("member_id")
       .notNull()
       .references(() => churchMember.id, { onDelete: "cascade" }),
     type: text("type").notNull(),

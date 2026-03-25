@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { branch } from "./organization";
@@ -22,11 +23,11 @@ export const bank = pgTable("bank", {
 export const financeAccount = pgTable(
   "finance_account",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: text("branch_id")
+    branchId: uuid("branch_id")
       .notNull()
       .references(() => branch.id),
     bankId: integer("bank_id").references(() => bank.id),
@@ -50,11 +51,11 @@ export const financeAccount = pgTable(
 export const financeChartOfAccounts = pgTable(
   "finance_chart_of_accounts",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    parentId: text("parent_id"),
+    parentId: uuid("parent_id"),
     name: text("name").notNull(),
     type: text("type").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -73,7 +74,7 @@ export const financeChartOfAccounts = pgTable(
 export const financeCostCenter = pgTable(
   "finance_cost_center",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
@@ -90,7 +91,7 @@ export const financeCostCenter = pgTable(
 export const financeSupplier = pgTable(
   "finance_supplier",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
@@ -121,26 +122,26 @@ export const financeSupplier = pgTable(
 export const financeTransaction = pgTable(
   "finance_transaction",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: text("branch_id")
+    branchId: uuid("branch_id")
       .notNull()
       .references(() => branch.id),
-    financeAccountId: text("finance_account_id")
+    financeAccountId: uuid("finance_account_id")
       .notNull()
       .references(() => financeAccount.id),
-    financeChartOfAccountId: text("finance_chart_of_account_id")
+    financeChartOfAccountId: uuid("finance_chart_of_account_id")
       .notNull()
       .references(() => financeChartOfAccounts.id),
-    financeCostCenterId: text("finance_cost_center_id").references(
+    financeCostCenterId: uuid("finance_cost_center_id").references(
       () => financeCostCenter.id,
     ),
-    financeSupplierId: text("finance_supplier_id").references(
+    financeSupplierId: uuid("finance_supplier_id").references(
       () => financeSupplier.id,
     ),
-    financeContributorId: text("finance_contributor_id").references(
+    financeContributorId: uuid("finance_contributor_id").references(
       () => churchMember.id,
     ),
     type: text("type").notNull(),
@@ -177,8 +178,8 @@ export const financeTransaction = pgTable(
 export const financeTransactionAttachment = pgTable(
   "finance_transaction_attachment",
   {
-    id: text("id").primaryKey(),
-    financeTransactionId: text("finance_transaction_id")
+    id: uuid("id").primaryKey().defaultRandom(),
+    financeTransactionId: uuid("finance_transaction_id")
       .notNull()
       .references(() => financeTransaction.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
