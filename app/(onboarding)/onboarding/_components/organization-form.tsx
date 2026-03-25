@@ -34,11 +34,7 @@ import { organizationFormSchema } from "@/validators/organization";
 
 type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
 
-interface OrganizationFormProps {
-  onSuccess: (organizationId: string) => void;
-}
-
-export default function OrganizationForm({ onSuccess }: OrganizationFormProps) {
+export default function OrganizationForm() {
   const router = useRouter();
 
   const form = useForm<OrganizationFormValues>({
@@ -83,7 +79,7 @@ export default function OrganizationForm({ onSuccess }: OrganizationFormProps) {
             organizationId,
           });
           toast.success("Organização criada com sucesso!");
-          onSuccess(organizationId);
+          router.push("/dashboard");
         },
         onError: (ctx) => {
           toast.error(ctx.error.message);
@@ -167,7 +163,7 @@ export default function OrganizationForm({ onSuccess }: OrganizationFormProps) {
                     {form.formState.isSubmitting ? (
                       <Loader2Icon className="h-4 w-4 animate-spin" />
                     ) : (
-                      "Continuar"
+                      "Cadastrar"
                     )}
                   </Button>
                 </Field>

@@ -24,27 +24,23 @@ export const data = {
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/",
         },
         {
           title: "Filiais",
-          url: "#",
-        },
-        {
-          title: "Ministérios",
-          url: "#",
+          url: "/branches",
         },
         {
           title: "Funções",
-          url: "#",
+          url: "/functions",
         },
         {
           title: "Cargos",
-          url: "#",
+          url: "/positions",
         },
         {
           title: "Usuários",
-          url: "#",
+          url: "/users",
         },
       ],
     },

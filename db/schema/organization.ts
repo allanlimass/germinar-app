@@ -14,11 +14,12 @@ export const branch = pgTable(
   "branch",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    isHeadquarters: boolean("is_headquarters").default(false).notNull(),
+    isHeadquarter: boolean("is_headquarter").default(false).notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
+    cnpj: text("cnpj"),
     phone: text("phone"),
     email: text("email"),
     zipCode: text("zip_code"),
