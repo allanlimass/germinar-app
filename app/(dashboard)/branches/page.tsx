@@ -1,38 +1,20 @@
+import { columns, Branch } from "./_components/columns";
+import { DataTable } from "../../../components/data-table";
+import { getSessionContext } from "@/lib/utils/db-utils";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { branch } from "@/db/schema/organization";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-
-import { columns, Branch } from "./columns";
-import { DataTable } from "./data-table";
+import { eq } from "drizzle-orm";
 
 export default async function BranchesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  const activeOrganizationId = session?.session.activeOrganizationId;
-
-  if (!activeOrganizationId) {
-    throw new Error("Usuário sem organização ativa.");
-  }
+  const { organizationId } = await getSessionContext();
 
   const branches = await db.query.branch.findMany({
-    where: eq(branch.organizationId, activeOrganizationId),
+    where: eq(branch.organizationId, organizationId),
   });
 
   return (
-    <main>
-      <div className="flex flex-row justify-between">
-        <h1>Branch</h1>
-        <Link href="/branches/new">
-          <Button>Adicionar</Button>
-        </Link>
-      </div>
-      <DataTable columns={columns} data={branches} />
-    </main>
+    <>
+      <DataTable columns={columns} data={branches as Branch[]} />
+    </>
   );
 }

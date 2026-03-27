@@ -26,7 +26,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import z from "zod";
 
-import { slugify } from "@/lib/utils/slugify";
+import { slugify } from "@/lib/utils/services";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
