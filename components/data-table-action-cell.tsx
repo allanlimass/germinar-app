@@ -21,16 +21,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { deleteBranch } from "@/app/actions/branch";
+import { deleteBranch } from "@/server/actions/branch";
 import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
 
-interface DataTableActionsProps {
+interface DataTableActionCellProps {
   path: string;
   id: string;
 }
 
-export function DataTableActions({ path, id }: DataTableActionsProps) {
+export function DataTableActionCell({ path, id }: DataTableActionCellProps) {
   const [open, setOpen] = useState(false);
 
   const router = useRouter();

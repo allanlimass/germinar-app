@@ -1,5 +1,5 @@
 import { createSafeActionClient } from "next-safe-action";
-import { auth } from "./auth";
+import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 
 export const actionClient = createSafeActionClient().use(async ({ next }) => {

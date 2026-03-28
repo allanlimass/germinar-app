@@ -35,18 +35,21 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  actionButtonLabel?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  actionButtonLabel,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
+  const pathname = usePathname();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -126,10 +129,12 @@ export function DataTable<TData, TValue>({
             Exportar
           </Button>
 
-          <Button onClick={() => router.push("/branches/new")}>
-            <PlusIcon className="h-4 w-4" />
-            Adicionar Filial
-          </Button>
+          {actionButtonLabel && (
+            <Button onClick={() => router.push(`${pathname}/new`)}>
+              <PlusIcon className="h-4 w-4" />
+              Adicionar {actionButtonLabel}
+            </Button>
+          )}
         </div>
       </div>
 

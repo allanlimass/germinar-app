@@ -1,5 +1,5 @@
 import { columns, Branch } from "./_components/columns";
-import { DataTable } from "../../../components/data-table";
+import { DataTable } from "../../../../components/data-table";
 import { getSessionContext } from "@/lib/utils/db-utils";
 import { db } from "@/db";
 import { branch } from "@/db/schema/organization";
@@ -14,7 +14,11 @@ export default async function BranchesPage() {
 
   return (
     <>
-      <DataTable columns={columns} data={branches as Branch[]} />
+      <DataTable
+        columns={columns}
+        data={branches as Branch[]}
+        actionButtonLabel="Filial"
+      />
     </>
   );
 }

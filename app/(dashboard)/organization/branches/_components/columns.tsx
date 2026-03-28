@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { branch } from "@/db/schema/organization";
-import { DataTableActions } from "@/components/data-table-actions";
+import { DataTableActionCell } from "@/components/data-table-action-cell";
 
 export type Branch = typeof branch.$inferSelect;
 
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Branch>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <DataTableActions path="/branches" id={row.original.id} />
+      <DataTableActionCell path="/organization/branches" id={row.original.id} />
     ),
   },
 ];

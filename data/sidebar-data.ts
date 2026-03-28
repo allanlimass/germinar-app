@@ -24,23 +24,23 @@ export const data = {
       items: [
         {
           title: "Dashboard",
-          url: "/",
+          url: "/organization",
         },
         {
           title: "Filiais",
-          url: "/branches",
+          url: "/organization/branches",
         },
         {
           title: "Funções",
-          url: "/functions",
+          url: "/organization/functions",
         },
         {
           title: "Cargos",
-          url: "/positions",
+          url: "/organization/positions",
         },
         {
           title: "Usuários",
-          url: "/users",
+          url: "/organization/users",
         },
       ],
     },

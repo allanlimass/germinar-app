@@ -2,9 +2,9 @@
 
 import * as React from "react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/layout/nav-main";
+import { NavSecondary } from "@/components/layout/nav-secondary";
+import { NavUser } from "@/components/layout/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/sidebar";
 
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
-import { data } from "@/components/sidebar-data";
+import { authClient } from "@/lib/auth/auth-client";
+import { data } from "@/data/sidebar-data";
 import { TerminalIcon } from "lucide-react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

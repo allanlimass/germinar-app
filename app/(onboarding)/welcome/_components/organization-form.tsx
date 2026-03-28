@@ -27,10 +27,10 @@ import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
 import { slugify } from "@/lib/utils/services";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { organizationFormSchema } from "@/validators/organization";
+import { organizationFormSchema } from "@/types/auth";
 
 type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
 
@@ -79,7 +79,7 @@ export default function OrganizationForm() {
             organizationId,
           });
           toast.success("Organização criada com sucesso!");
-          router.push("/dashboard");
+          router.push("/organization");
         },
         onError: (ctx) => {
           toast.error(ctx.error.message);

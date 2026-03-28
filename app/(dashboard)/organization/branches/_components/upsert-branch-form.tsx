@@ -1,6 +1,6 @@
 "use client";
 
-import { createBranch, updateBranch } from "@/app/actions/branch";
+import { createBranch, updateBranch } from "@/server/actions/branch";
 import { Button } from "@/components/ui/button";
 import {
   FieldGroup,
@@ -23,7 +23,7 @@ import {
   formatPhoneNumber,
   formatZipCode,
 } from "@/lib/utils/services";
-import { branchFormSchema } from "@/validators/branch";
+import { branchFormSchema } from "@/types/organization";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -61,7 +61,7 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
   const createBranchAction = useAction(createBranch, {
     onSuccess: () => {
       toast.success("Filial criada com sucesso!");
-      router.push("/branches");
+      router.push("/organization/branches");
       router.refresh();
     },
     onError: ({ error }) => {
@@ -72,7 +72,7 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
   const updateBranchAction = useAction(updateBranch, {
     onSuccess: () => {
       toast.success("Filial atualizada com sucesso!");
-      router.push("/branches");
+      router.push("/organization/branches");
       router.refresh();
     },
     onError: ({ error }) => {
@@ -360,8 +360,10 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />
-                ) : (
+                ) : isEditing ? (
                   "Salvar & Continuar"
+                ) : (
+                  "Adicionar & Continuar"
                 )}
               </Button>
 
@@ -369,8 +371,10 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />
-                ) : (
+                ) : isEditing ? (
                   "Salvar"
+                ) : (
+                  "Adicionar"
                 )}
               </Button>
             </Field>

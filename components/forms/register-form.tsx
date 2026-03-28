@@ -20,7 +20,7 @@ import * as z from "zod";
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -70,7 +70,7 @@ export function RegisterForm() {
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         password: data.password,
-        callbackURL: "/dashboard",
+        callbackURL: "/organization",
       },
       {
         onError: (ctx) => {
@@ -82,7 +82,7 @@ export function RegisterForm() {
         },
         onSuccess: () => {
           toast.success("Conta criada com sucesso!");
-          router.push("/dashboard");
+          router.push("/organization");
         },
       },
     );

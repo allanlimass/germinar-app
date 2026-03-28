@@ -21,7 +21,7 @@ import z from "zod";
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EyeIcon, KeyRoundIcon, Loader2Icon, MailIcon } from "lucide-react";
@@ -85,14 +85,14 @@ export function LoginForm() {
     await authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/organization",
       },
       {
         onError: (ctx) => {
           toast.error("Erro ao realizar login com Google.");
         },
         onSuccess: () => {
-          router.push("/dashboard");
+          router.push("/organization");
         },
       },
     );

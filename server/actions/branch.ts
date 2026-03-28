@@ -1,10 +1,9 @@
 "use server";
 
-import { actionClient } from "@/lib/safe-action";
-import { branchFormSchema } from "@/validators/branch";
+import { actionClient } from "@/lib/safe-action/safe-action";
+import { branchFormSchema } from "@/types/organization";
 import { db } from "@/db";
-import { branch } from "@/db/schema/organization";
-import { branchMember } from "@/db/schema/organization";
+import { branch, branchMember } from "@/db/schema/organization";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 

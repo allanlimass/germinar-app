@@ -13,3 +13,9 @@ export const branchFormSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
 });
+
+export const branchMemberFormSchema = z.object({
+  branchId: z.string().min(1, "Campo obrigatório"),
+  userId: z.string().min(1, "Campo obrigatório"),
+  role: z.string().min(1, "Campo obrigatório"),
+});

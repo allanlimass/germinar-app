@@ -1,39 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
+
+const publicRoutes = [
+  { path: "/", exact: true },
+  { path: "/login", exact: true },
+  { path: "/register", exact: true },
+];
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const isPublicRoute = publicRoutes.some((route) => {
+    if (route.exact) {
+      return pathname === route.path;
+    }
+    return pathname.startsWith(route.path);
+  });
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const pathname = request.nextUrl.pathname;
-
-  const isAuthRoute = pathname === "/login" || pathname === "/register";
-  const isOnboardingRoute = pathname.startsWith("/onboarding");
-  const isPrivateRoute = pathname.startsWith("/dashboard");
-
-  const hasSession = !!session;
+  const isAuthenticated = !!session;
   const hasOrganization = !!session?.session?.activeOrganizationId;
+  const isOnboardingRoute = pathname.startsWith("/welcome");
 
-  if (isAuthRoute && hasSession && hasOrganization)
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-
-  if (isAuthRoute && hasSession && !hasOrganization)
-    return NextResponse.redirect(new URL("/onboarding", request.url));
-
-  if ((isPrivateRoute || isOnboardingRoute) && !hasSession)
+  // 1. Usuários NÃO logados
+  if (!isAuthenticated) {
+    if (isPublicRoute) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL("/login", request.url));
+  }
 
-  if (isPrivateRoute && hasSession && !hasOrganization)
-    return NextResponse.redirect(new URL("/onboarding", request.url));
+  // --- O fluxo abaixo garante que o usuário ESTÁ autenticado ---
 
-  if (isOnboardingRoute && hasSession && hasOrganization)
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // 2. Usuários logados SEM organização (em processo de Onboarding)
+  if (!hasOrganization) {
+    if (isOnboardingRoute) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL("/welcome", request.url));
+  }
 
+  // 3. Usuários logados COM organização
+  if (isPublicRoute || isOnboardingRoute) {
+    return NextResponse.redirect(new URL("/organization", request.url));
+  }
+
+  // Rotas privadas liberadas (ex: /organization/*)
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register", "/onboarding"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
 };
