@@ -41,12 +41,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   actionButtonLabel?: string;
+  searchableColumn?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   actionButtonLabel,
+  searchableColumn,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -82,10 +84,14 @@ export function DataTable<TData, TValue>({
             <InputGroupInput
               placeholder="Pesquisar"
               value={
-                (table.getColumn("name")?.getFilterValue() as string) ?? ""
+                (table
+                  .getColumn(searchableColumn)
+                  ?.getFilterValue() as string) ?? ""
               }
               onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
+                table
+                  .getColumn(searchableColumn)
+                  ?.setFilterValue(event.target.value)
               }
               className="max-w-sm"
             />

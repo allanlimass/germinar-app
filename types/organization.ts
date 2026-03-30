@@ -2,13 +2,14 @@ import { z } from "zod";
 
 export const branchFormSchema = z.object({
   isHeadquarter: z.boolean(),
-  name: z.string().min(3, "Campo obrigatório"),
+  name: z.string().min(1, "Campo obrigatório"),
   cnpj: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal("")),
+  email: z.email().optional().or(z.literal("")),
   zipCode: z.string().optional(),
   street: z.string().optional(),
   number: z.string().optional(),
+  complement: z.string().optional(),
   neighborhood: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),

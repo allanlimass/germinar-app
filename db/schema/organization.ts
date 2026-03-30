@@ -6,6 +6,7 @@ import {
   index,
   boolean,
   uuid,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { relations } from "drizzle-orm";
@@ -25,6 +26,7 @@ export const branch = pgTable(
     zipCode: text("zip_code"),
     street: text("street"),
     number: text("number"),
+    complement: text("complement"),
     neighborhood: text("neighborhood"),
     city: text("city"),
     state: text("state"),
@@ -60,12 +62,18 @@ export const branchMember = pgTable(
   ],
 );
 
-export const permission = pgTable("permission", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  module: text("module").notNull(),
-  action: text("action").notNull(),
-  description: text("description").notNull(),
-});
+export const permission = pgTable(
+  "permission",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    module: text("module").notNull(),
+    action: text("action").notNull(),
+    description: text("description").notNull(),
+  },
+  (table) => [
+    uniqueIndex("permission_module_action_idx").on(table.module, table.action),
+  ],
+);
 
 export const branchMemberPermission = pgTable(
   "branch_member_permission",

@@ -1,6 +1,6 @@
 "use client";
 
-import { createBranch, updateBranch } from "@/server/actions/branch";
+import { createBranch, updateBranch } from "@/actions/branch";
 import { Button } from "@/components/ui/button";
 import {
   FieldGroup,
@@ -32,37 +32,46 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Branch } from "./columns";
+import React from "react";
 
 interface UpsertBranchFormProps {
   initialData?: Branch;
 }
 
 export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
-  const isEditing = !!initialData;
   const router = useRouter();
+
+  const submitTypeRef = React.useRef<"default" | "continue">("default");
+  const isEditing = !!initialData;
 
   const form = useForm<z.infer<typeof branchFormSchema>>({
     resolver: zodResolver(branchFormSchema),
-    defaultValues: initialData || {
-      isHeadquarter: false,
-      name: "",
-      cnpj: "",
-      phone: "",
-      email: "",
-      zipCode: "",
-      street: "",
-      number: "",
-      neighborhood: "",
-      city: "",
-      state: "",
+    defaultValues: {
+      ...initialData,
+      isHeadquarter: initialData?.isHeadquarter || false,
+      name: initialData?.name || "",
+      cnpj: initialData?.cnpj || "",
+      phone: initialData?.phone || "",
+      email: initialData?.email || "",
+      zipCode: initialData?.zipCode || "",
+      street: initialData?.street || "",
+      number: initialData?.number || "",
+      complement: initialData?.complement || "",
+      neighborhood: initialData?.neighborhood || "",
+      city: initialData?.city || "",
+      state: initialData?.state || "",
     },
   });
 
   const createBranchAction = useAction(createBranch, {
     onSuccess: () => {
       toast.success("Filial criada com sucesso!");
+      if (submitTypeRef.current === "continue") {
+        form.reset();
+        router.refresh();
+        return;
+      }
       router.push("/organization/branches");
-      router.refresh();
     },
     onError: ({ error }) => {
       toast.error("Erro ao criar filial: " + error.serverError);
@@ -72,8 +81,11 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
   const updateBranchAction = useAction(updateBranch, {
     onSuccess: () => {
       toast.success("Filial atualizada com sucesso!");
+      if (submitTypeRef.current === "continue") {
+        router.refresh();
+        return;
+      }
       router.push("/organization/branches");
-      router.refresh();
     },
     onError: ({ error }) => {
       toast.error("Erro ao atualizar filial: " + error.serverError);
@@ -268,7 +280,25 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
+              <Controller
+                name="complement"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="col-span-2">
+                    <FieldLabel htmlFor={field.name}>Complemento</FieldLabel>
+                    <Input
+                      id={field.name}
+                      {...field}
+                      placeholder="Digite o complemento"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
               <Controller
                 name="neighborhood"
                 control={form.control}
@@ -291,7 +321,7 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
                 name="city"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field className="col-span-2">
                     <FieldLabel htmlFor={field.name}>Cidade</FieldLabel>
                     <Input
                       id={field.name}
@@ -353,9 +383,10 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
               className="flex flex-1 items-center justify-end gap-4"
             >
               <Button
-                type="button"
+                type="submit"
                 variant="outline"
                 disabled={form.formState.isSubmitting}
+                onClick={() => (submitTypeRef.current = "continue")}
               >
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
@@ -367,7 +398,11 @@ export function UpsertBranchForm({ initialData }: UpsertBranchFormProps) {
                 )}
               </Button>
 
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                onClick={() => (submitTypeRef.current = "default")}
+              >
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />

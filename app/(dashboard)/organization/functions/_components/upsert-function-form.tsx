@@ -1,6 +1,6 @@
 "use client";
 
-import { createBranch, updateBranch } from "@/server/actions/branch";
+import { createBranch, updateBranch } from "@/actions/branch";
 import { Button } from "@/components/ui/button";
 import {
   FieldGroup,

@@ -46,8 +46,16 @@ export const updateBranch = actionClient
 
 export const deleteBranch = actionClient
   .inputSchema(z.object({ id: z.string() }))
-  .action(async ({ parsedInput }) => {
-    await db.delete(branch).where(eq(branch.id, parsedInput.id));
+  .action(async ({ parsedInput, ctx }) => {
+    const { organizationId } = ctx;
+    await db
+      .delete(branch)
+      .where(
+        and(
+          eq(branch.id, parsedInput.id),
+          eq(branch.organizationId, organizationId),
+        ),
+      );
 
     return { success: true };
   });
