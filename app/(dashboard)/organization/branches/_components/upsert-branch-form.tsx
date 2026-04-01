@@ -23,7 +23,7 @@ import {
   formatPhoneNumber,
   formatZipCode,
 } from "@/lib/utils/services";
-import { branchFormSchema } from "@/types/organization";
+import { branchFormSchema } from "@/lib/validations/branch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";

@@ -30,7 +30,7 @@ import { slugify } from "@/lib/utils/services";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { organizationFormSchema } from "@/types/auth";
+import { organizationFormSchema } from "@/lib/validations/organization";
 
 type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
 

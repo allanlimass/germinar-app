@@ -4,12 +4,10 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DataTableActionCell } from "@/components/data-table-action-cell";
-import { churchFunction } from "@/db/schema/people";
+import { RoleActionCell } from "./role-action-cell";
+import { ChurchRoleSchema } from "@/lib/validations/church-role";
 
-export type Function = typeof churchFunction.$inferSelect;
-
-export const columns: ColumnDef<Function>[] = [
+export const columns: ColumnDef<ChurchRoleSchema>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -47,10 +45,7 @@ export const columns: ColumnDef<Function>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <DataTableActionCell
-        path="/organization/functions"
-        id={row.original.id}
-      />
+      <RoleActionCell path="/organization/roles" id={row.original.id} />
     ),
   },
 ];

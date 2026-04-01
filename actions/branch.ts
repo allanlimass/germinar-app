@@ -1,7 +1,7 @@
 "use server";
 
 import { actionClient } from "@/lib/safe-action/safe-action";
-import { branchFormSchema } from "@/types/organization";
+import { branchFormSchema } from "@/lib/validations/branch";
 import { db } from "@/db";
 import { branch, branchMember } from "@/db/schema/organization";
 import { and, eq } from "drizzle-orm";
@@ -30,7 +30,7 @@ export const createBranch = actionClient
   });
 
 export const updateBranch = actionClient
-  .inputSchema(branchFormSchema.extend({ id: z.string() }))
+  .inputSchema(branchFormSchema.extend({ id: z.uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
     const { id, ...data } = parsedInput;
@@ -45,7 +45,7 @@ export const updateBranch = actionClient
   });
 
 export const deleteBranch = actionClient
-  .inputSchema(z.object({ id: z.string() }))
+  .inputSchema(z.object({ id: z.uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
     await db
