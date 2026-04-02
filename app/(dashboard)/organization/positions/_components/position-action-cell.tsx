@@ -17,12 +17,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { DataTableActionCell } from "@/components/data-table-action-cell";
 
-interface RoleActionCellProps {
+interface PositionActionCellProps {
   id: string;
   path: string;
 }
 
-export function RoleActionCell({ id, path }: RoleActionCellProps) {
+export function PositionActionCell({ id, path }: PositionActionCellProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -32,12 +32,12 @@ export function RoleActionCell({ id, path }: RoleActionCellProps) {
 
   const deleteAction = useAction(deleteChurchPosition, {
     onSuccess: () => {
-      toast.success("Função excluída com sucesso!");
+      toast.success("Cargo excluído com sucesso!");
       router.refresh();
       setOpen(false);
     },
     onError: ({ error }) => {
-      toast.error("Erro ao excluir função: " + error.serverError);
+      toast.error("Erro ao excluir cargo: " + error.serverError);
     },
   });
 

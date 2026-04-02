@@ -148,9 +148,10 @@ export function UpsertChurchPositionForm({
               className="flex flex-1 items-center justify-end gap-4"
             >
               <Button
-                type="button"
+                type="submit"
                 variant="outline"
                 disabled={form.formState.isSubmitting}
+                onClick={() => (submitTypeRef.current = "continue")}
               >
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
@@ -162,7 +163,11 @@ export function UpsertChurchPositionForm({
                 )}
               </Button>
 
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                onClick={() => (submitTypeRef.current = "default")}
+              >
                 <SaveIcon className="h-4 w-4" />
                 {form.formState.isSubmitting ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />

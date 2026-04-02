@@ -3,7 +3,7 @@
 import { actionClient } from "@/lib/safe-action/safe-action";
 import { branchFormSchema } from "@/lib/validations/branch";
 import { db } from "@/db";
-import { branch, branchMember } from "@/db/schema/organization";
+import { branch, branchUser } from "@/db/schema/organization";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 
@@ -20,7 +20,7 @@ export const createBranch = actionClient
       })
       .returning();
 
-    await db.insert(branchMember).values({
+    await db.insert(branchUser).values({
       branchId: newBranch.id,
       userId: session.user.id,
       role: "owner",

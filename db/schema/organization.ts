@@ -39,8 +39,8 @@ export const branch = pgTable(
   (table) => [index("branch_organizationId_idx").on(table.organizationId)],
 );
 
-export const branchMember = pgTable(
-  "branch_member",
+export const branchUser = pgTable(
+  "branch_user",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     branchId: uuid("branch_id")
@@ -57,8 +57,8 @@ export const branchMember = pgTable(
       .notNull(),
   },
   (table) => [
-    index("branchMember_branchId_idx").on(table.branchId),
-    index("branchMember_userId_idx").on(table.userId),
+    index("branchUser_branchId_idx").on(table.branchId),
+    index("branchUser_userId_idx").on(table.userId),
   ],
 );
 
@@ -75,20 +75,20 @@ export const permission = pgTable(
   ],
 );
 
-export const branchMemberPermission = pgTable(
+export const branchUserPermission = pgTable(
   "branch_member_permission",
   {
-    branchMemberId: uuid("branch_member_id")
+    branchUserId: uuid("branch_member_id")
       .notNull()
-      .references(() => branchMember.id, { onDelete: "cascade" }),
+      .references(() => branchUser.id, { onDelete: "cascade" }),
     permissionId: uuid("permission_id")
       .notNull()
       .references(() => permission.id, { onDelete: "cascade" }),
   },
   (table) => [
-    primaryKey({ columns: [table.branchMemberId, table.permissionId] }),
-    index("branchMemberPermission_branchMemberId_idx").on(table.branchMemberId),
-    index("branchMemberPermission_permissionId_idx").on(table.permissionId),
+    primaryKey({ columns: [table.branchUserId, table.permissionId] }),
+    index("branchUserPermission_branchUserId_idx").on(table.branchUserId),
+    index("branchUserPermission_permissionId_idx").on(table.permissionId),
   ],
 );
 
@@ -97,34 +97,31 @@ export const branchRelations = relations(branch, ({ one, many }) => ({
     fields: [branch.organizationId],
     references: [organization.id],
   }),
-  members: many(branchMember),
+  members: many(branchUser),
 }));
 
-export const branchMemberRelations = relations(
-  branchMember,
-  ({ one, many }) => ({
-    branch: one(branch, {
-      fields: [branchMember.branchId],
-      references: [branch.id],
-    }),
-    user: one(user, { fields: [branchMember.userId], references: [user.id] }),
-    permissions: many(branchMemberPermission),
+export const branchUserRelations = relations(branchUser, ({ one, many }) => ({
+  branch: one(branch, {
+    fields: [branchUser.branchId],
+    references: [branch.id],
   }),
-);
+  user: one(user, { fields: [branchUser.userId], references: [user.id] }),
+  permissions: many(branchUserPermission),
+}));
 
 export const permissionRelations = relations(permission, ({ many }) => ({
-  branchMemberPermissions: many(branchMemberPermission),
+  branchUserPermissions: many(branchUserPermission),
 }));
 
-export const branchMemberPermissionRelations = relations(
-  branchMemberPermission,
+export const branchUserPermissionRelations = relations(
+  branchUserPermission,
   ({ one }) => ({
-    branchMember: one(branchMember, {
-      fields: [branchMemberPermission.branchMemberId],
-      references: [branchMember.id],
+    branchUser: one(branchUser, {
+      fields: [branchUserPermission.branchUserId],
+      references: [branchUser.id],
     }),
     permission: one(permission, {
-      fields: [branchMemberPermission.permissionId],
+      fields: [branchUserPermission.permissionId],
       references: [permission.id],
     }),
   }),

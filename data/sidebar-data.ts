@@ -66,15 +66,15 @@ export const data = {
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/people/dashboard",
         },
         {
           title: "Membresia",
-          url: "#",
+          url: "/people/membership",
         },
         {
           title: "Relatórios",
-          url: "#",
+          url: "/people/reports",
         },
       ],
     },
