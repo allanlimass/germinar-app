@@ -9,33 +9,36 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  ChurchRoleSchema,
-  InsertChurchRole,
-  insertChurchRoleSchema,
-} from "@/lib/validations/church-role";
+  ChurchPositionSchema,
+  InsertChurchPosition,
+  insertChurchPositionSchema,
+} from "@/lib/validations/positions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createChurchRole, updateChurchRole } from "@/actions/church-role";
+import {
+  createChurchPosition,
+  updateChurchPosition,
+} from "@/actions/positions";
 import React from "react";
 
-interface UpsertChurchRoleFormProps {
-  initialData?: ChurchRoleSchema;
+interface UpsertChurchPositionFormProps {
+  initialData?: ChurchPositionSchema;
 }
 
-export function UpsertChurchRoleForm({
+export function UpsertChurchPositionForm({
   initialData,
-}: UpsertChurchRoleFormProps) {
+}: UpsertChurchPositionFormProps) {
   const router = useRouter();
 
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
-  const form = useForm<InsertChurchRole>({
-    resolver: zodResolver(insertChurchRoleSchema),
+  const form = useForm<InsertChurchPosition>({
+    resolver: zodResolver(insertChurchPositionSchema),
     defaultValues: {
       ...initialData,
       name: initialData?.name || "",
@@ -43,40 +46,40 @@ export function UpsertChurchRoleForm({
     },
   });
 
-  const createChurchRoleAction = useAction(createChurchRole, {
+  const createChurchPositionAction = useAction(createChurchPosition, {
     onSuccess: () => {
-      toast.success("Função criada com sucesso!");
+      toast.success("Cargo criado com sucesso!");
       if (submitTypeRef.current === "continue") {
         form.reset();
         router.refresh();
         return;
       }
-      router.push("/organization/roles");
+      router.push("/organization/positions");
     },
     onError: ({ error }) => {
-      toast.error("Erro ao criar função: " + error.serverError);
+      toast.error("Erro ao criar cargo: " + error.serverError);
     },
   });
 
-  const updateChurchRoleAction = useAction(updateChurchRole, {
+  const updateChurchPositionAction = useAction(updateChurchPosition, {
     onSuccess: () => {
-      toast.success("Função atualizada com sucesso!");
+      toast.success("Cargo atualizado com sucesso!");
       if (submitTypeRef.current === "continue") {
         router.refresh();
         return;
       }
-      router.push("/organization/roles");
+      router.push("/organization/positions");
     },
     onError: ({ error }) => {
-      toast.error("Erro ao atualizar função: " + error.serverError);
+      toast.error("Erro ao atualizar cargo: " + error.serverError);
     },
   });
 
-  const onSubmit = (data: InsertChurchRole) => {
+  const onSubmit = (data: InsertChurchPosition) => {
     if (isEditing && initialData) {
-      updateChurchRoleAction.execute({ ...data, id: initialData.id });
+      updateChurchPositionAction.execute({ ...data, id: initialData.id });
     } else {
-      createChurchRoleAction.execute(data);
+      createChurchPositionAction.execute(data);
     }
   };
   return (

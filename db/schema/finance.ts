@@ -5,6 +5,7 @@ import {
   integer,
   numeric,
   pgTable,
+  pgEnum,
   text,
   timestamp,
   uuid,
@@ -119,6 +120,23 @@ export const financeSupplier = pgTable(
   (table) => [index("person_organizationId_idx").on(table.organizationId)],
 );
 
+export const financeTransactionType = pgEnum("finance_transaction_type", [
+  "income",
+  "expense",
+  "transfer",
+]);
+export const financeTransactionStatus = pgEnum("finance_transaction_status", [
+  "pending",
+  "paid",
+  "overdue",
+  "canceled",
+]);
+export const financeTransactionSource = pgEnum("finance_transaction_source", [
+  "manual",
+  "import",
+  "gateway",
+]);
+
 export const financeTransaction = pgTable(
   "finance_transaction",
   {
@@ -144,12 +162,14 @@ export const financeTransaction = pgTable(
     financeContributorId: uuid("finance_contributor_id").references(
       () => churchMember.id,
     ),
-    type: text("type").notNull(),
+    type: financeTransactionType("type").notNull(),
     amount: numeric("amount").notNull(),
     description: text("description"),
     dueDate: timestamp("due_date"),
     paymentDate: timestamp("payment_date"),
-    status: text("status").default("pending").notNull(),
+    status: financeTransactionStatus("status").notNull().default("pending"),
+    source: financeTransactionSource("source").notNull().default("manual"),
+    externalId: text("external_id"),
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),

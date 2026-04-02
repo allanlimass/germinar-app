@@ -1,4 +1,4 @@
-import { deleteChurchRole } from "@/actions/church-role";
+import { deleteChurchPosition } from "@/actions/positions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +30,7 @@ export function RoleActionCell({ id, path }: RoleActionCellProps) {
     router.push(`${path}/${id}`);
   };
 
-  const deleteAction = useAction(deleteChurchRole, {
+  const deleteAction = useAction(deleteChurchPosition, {
     onSuccess: () => {
       toast.success("Função excluída com sucesso!");
       router.refresh();

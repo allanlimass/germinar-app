@@ -31,12 +31,12 @@ export const data = {
           url: "/organization/branches",
         },
         {
-          title: "Funções",
-          url: "/organization/functions",
-        },
-        {
           title: "Cargos",
           url: "/organization/positions",
+        },
+        {
+          title: "Funções",
+          url: "/organization/functions",
         },
         {
           title: "Usuários",
