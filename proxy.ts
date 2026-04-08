@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth/auth";
+import { auth } from "@/lib/auth";
 
 const publicRoutes = [
   { path: "/", exact: true },
   { path: "/login", exact: true },
   { path: "/register", exact: true },
+  { path: "/accept-invitation", exact: false },
 ];
 
 export async function proxy(request: NextRequest) {
@@ -25,6 +26,7 @@ export async function proxy(request: NextRequest) {
   const isAuthenticated = !!session;
   const hasOrganization = !!session?.session?.activeOrganizationId;
   const isOnboardingRoute = pathname.startsWith("/welcome");
+  const isAcceptInvitationRoute = pathname.startsWith("/accept-invitation");
 
   // 1. Usuários NÃO logados
   if (!isAuthenticated) {
@@ -38,14 +40,14 @@ export async function proxy(request: NextRequest) {
 
   // 2. Usuários logados SEM organização (em processo de Onboarding)
   if (!hasOrganization) {
-    if (isOnboardingRoute) {
+    if (isOnboardingRoute || isAcceptInvitationRoute) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
   // 3. Usuários logados COM organização
-  if (isPublicRoute || isOnboardingRoute) {
+  if ((isPublicRoute || isOnboardingRoute) && !isAcceptInvitationRoute) {
     return NextResponse.redirect(new URL("/organization", request.url));
   }
 

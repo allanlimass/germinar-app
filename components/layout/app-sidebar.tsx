@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import Link from "next/link";
-import { authClient } from "@/lib/auth/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { data } from "@/data/sidebar-data";
 import { TerminalIcon } from "lucide-react";
 

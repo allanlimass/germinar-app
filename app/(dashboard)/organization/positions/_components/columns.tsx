@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PositionActionCell } from "./position-action-cell";
-import { ChurchPositionSchema } from "@/lib/validations/positions";
+import { ChurchPositionSchema } from "@/lib/validations/position";
 
 export const columns: ColumnDef<ChurchPositionSchema>[] = [
   {

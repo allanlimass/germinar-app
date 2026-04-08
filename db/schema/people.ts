@@ -1,13 +1,12 @@
 import {
   pgTable,
+  pgEnum,
   text,
   timestamp,
-  primaryKey,
   index,
   uuid,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
-import { branch } from "./organization";
 import { relations } from "drizzle-orm";
 
 export const churchPosition = pgTable(
@@ -42,6 +41,16 @@ export const churchFunction = pgTable(
   ],
 );
 
+export const memberTypeEnum = pgEnum("member_type", ["MEMBER", "VISITOR"]);
+export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
+export const maritalStatusEnum = pgEnum("marital_status", [
+  "SINGLE",
+  "MARRIED",
+  "DIVORCED",
+  "WIDOWED",
+]);
+export const memberStatusEnum = pgEnum("member_status", ["ACTIVE", "INACTIVE"]);
+
 export const churchMember = pgTable(
   "church_member",
   {
@@ -56,11 +65,11 @@ export const churchMember = pgTable(
         onDelete: "set null",
       },
     ),
-    type: text("type").notNull().default("visitor"),
+    type: memberTypeEnum("type").default("MEMBER").notNull(),
     name: text("name").notNull(),
     birthDate: timestamp("birth_date"),
-    gender: text("gender"),
-    maritalStatus: text("marital_status"),
+    gender: genderEnum("gender"),
+    maritalStatus: maritalStatusEnum("marital_status"),
     cpf: text("cpf").unique(),
     profession: text("profession"),
     photoUrl: text("photo_url"),
@@ -73,7 +82,7 @@ export const churchMember = pgTable(
     neighborhood: text("neighborhood"),
     city: text("city"),
     state: text("state"),
-    status: text("status").default("active").notNull(),
+    status: memberStatusEnum("status").default("ACTIVE").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -84,65 +93,6 @@ export const churchMember = pgTable(
     index("churchMember_organizationId_idx").on(table.organizationId),
     index("churchMember_userId_idx").on(table.userId),
     index("churchMember_churchPositionId_idx").on(table.churchPositionId),
-  ],
-);
-
-export const churchMemberFunction = pgTable(
-  "church_member_function",
-  {
-    memberId: uuid("member_id")
-      .notNull()
-      .references(() => churchMember.id, { onDelete: "cascade" }),
-    functionId: uuid("function_id")
-      .notNull()
-      .references(() => churchFunction.id, { onDelete: "cascade" }),
-    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.memberId, table.functionId] }),
-    index("memberFunction_memberId_idx").on(table.memberId),
-    index("memberFunction_functionId_idx").on(table.functionId),
-  ],
-);
-
-export const churchMemberBranch = pgTable(
-  "church_member_branch",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    memberId: uuid("member_id")
-      .notNull()
-      .references(() => churchMember.id, { onDelete: "cascade" }),
-    branchId: uuid("branch_id")
-      .notNull()
-      .references(() => branch.id, { onDelete: "cascade" }),
-    joinedAt: timestamp("joined_at").defaultNow().notNull(),
-    leftAt: timestamp("left_at"),
-  },
-  (table) => [
-    index("memberBranch_memberId_idx").on(table.memberId),
-    index("memberBranch_branchId_idx").on(table.branchId),
-  ],
-);
-
-export const churchMemberEvent = pgTable(
-  "church_member_event",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    memberId: uuid("member_id")
-      .notNull()
-      .references(() => churchMember.id, { onDelete: "cascade" }),
-    type: text("type").notNull(),
-    description: text("description"),
-    occurredAt: timestamp("occurred_at").defaultNow().notNull(),
-    createdBy: text("created_by").references(() => user.id, {
-      onDelete: "set null",
-    }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [
-    index("memberEvent_memberId_idx").on(table.memberId),
-    index("memberEvent_type_idx").on(table.type),
-    index("memberEvent_createdBy_idx").on(table.createdBy),
   ],
 );
 
@@ -168,65 +118,17 @@ export const churchFunctionRelations = relations(
   }),
 );
 
-export const churchMemberRelations = relations(
-  churchMember,
-  ({ one, many }) => ({
-    organization: one(organization, {
-      fields: [churchMember.organizationId],
-      references: [organization.id],
-    }),
-    user: one(user, {
-      fields: [churchMember.userId],
-      references: [user.id],
-    }),
-    churchPosition: one(churchPosition, {
-      fields: [churchMember.churchPositionId],
-      references: [churchPosition.id],
-    }),
-    functions: many(churchMemberFunction),
-    branches: many(churchMemberBranch),
-    events: many(churchMemberEvent),
+export const churchMemberRelations = relations(churchMember, ({ one }) => ({
+  organization: one(organization, {
+    fields: [churchMember.organizationId],
+    references: [organization.id],
   }),
-);
-
-export const churchMemberFunctionRelations = relations(
-  churchMemberFunction,
-  ({ one }) => ({
-    member: one(churchMember, {
-      fields: [churchMemberFunction.memberId],
-      references: [churchMember.id],
-    }),
-    function: one(churchFunction, {
-      fields: [churchMemberFunction.functionId],
-      references: [churchFunction.id],
-    }),
+  user: one(user, {
+    fields: [churchMember.userId],
+    references: [user.id],
   }),
-);
-
-export const churchMemberBranchRelations = relations(
-  churchMemberBranch,
-  ({ one }) => ({
-    member: one(churchMember, {
-      fields: [churchMemberBranch.memberId],
-      references: [churchMember.id],
-    }),
-    branch: one(branch, {
-      fields: [churchMemberBranch.branchId],
-      references: [branch.id],
-    }),
+  churchPosition: one(churchPosition, {
+    fields: [churchMember.churchPositionId],
+    references: [churchPosition.id],
   }),
-);
-
-export const churchMemberEventRelations = relations(
-  churchMemberEvent,
-  ({ one }) => ({
-    member: one(churchMember, {
-      fields: [churchMemberEvent.memberId],
-      references: [churchMember.id],
-    }),
-    createdBy: one(user, {
-      fields: [churchMemberEvent.createdBy],
-      references: [user.id],
-    }),
-  }),
-);
+}));

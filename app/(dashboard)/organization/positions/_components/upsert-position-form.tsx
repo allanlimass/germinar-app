@@ -12,7 +12,7 @@ import {
   ChurchPositionSchema,
   InsertChurchPosition,
   insertChurchPositionSchema,
-} from "@/lib/validations/positions";
+} from "@/lib/validations/position";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";

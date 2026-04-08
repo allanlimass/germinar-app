@@ -16,19 +16,17 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 
-import * as z from "zod";
-
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "../ui/input-group";
+} from "@/components/ui/input-group";
 import {
   EyeIcon,
   KeyRoundIcon,
@@ -37,21 +35,20 @@ import {
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { RegisterFormValues, registerSchema } from "@/lib/validations/register";
 
-const registerSchema = z.object({
-  firstName: z.string().trim().min(1, { message: "Nome é obrigatório" }),
-  lastName: z.string().trim().min(1, { message: "Sobrenome é obrigatório" }),
-  email: z.string().trim().min(1, { message: "Email é obrigatório" }).email({
-    message: "Email inválido",
-  }),
-  password: z.string().trim().min(8, {
-    message: "Senha deve ter pelo menos 8 caracteres",
-  }),
-});
+interface RegisterFormProps {
+  invitationId?: string;
+  email?: string;
+  status?: string;
+}
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
-
-export function RegisterForm() {
+export function RegisterForm({
+  invitationId,
+  email,
+  status,
+}: RegisterFormProps) {
   const router = useRouter();
 
   const form = useForm<RegisterFormValues>({
@@ -59,10 +56,16 @@ export function RegisterForm() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      email: "",
+      email: email || "",
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (invitationId && !status) {
+      toast.error("Convite expirado. Aguarde a aprovação do administrador.");
+    }
+  }, [invitationId, status]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     await authClient.signUp.email(
@@ -70,7 +73,9 @@ export function RegisterForm() {
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         password: data.password,
-        callbackURL: "/organization",
+        callbackURL: invitationId
+          ? `/accept-invitation/${invitationId}`
+          : "/organization",
       },
       {
         onError: (ctx) => {
@@ -82,7 +87,11 @@ export function RegisterForm() {
         },
         onSuccess: () => {
           toast.success("Conta criada com sucesso!");
-          router.push("/organization");
+          router.push(
+            invitationId
+              ? `/accept-invitation/${invitationId}`
+              : "/organization",
+          );
         },
       },
     );
@@ -95,6 +104,7 @@ export function RegisterForm() {
           <CardTitle className="text-xl">Registre-se</CardTitle>
           <CardDescription>Registre-se com sua conta</CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="gap-4">
@@ -158,8 +168,9 @@ export function RegisterForm() {
                       <InputGroupInput
                         id={field.name}
                         type="email"
-                        placeholder="Digite seu email"
+                        placeholder={email ? email : "Digite seu email"}
                         required
+                        disabled={!!email}
                         {...field}
                       />
                       <InputGroupAddon>

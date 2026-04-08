@@ -17,12 +17,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { DataTableActionCell } from "@/components/data-table-action-cell";
 
-interface RoleActionCellProps {
+interface FunctionActionCellProps {
   id: string;
   path: string;
 }
 
-export function RoleActionCell({ id, path }: RoleActionCellProps) {
+export function FunctionActionCell({ id, path }: FunctionActionCellProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import OrganizationForm from "./_components/organization-form";
-import { authClient } from "@/lib/auth/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
 
@@ -16,14 +16,11 @@ export default function WelcomePage() {
         const { data: orgs } = await authClient.organization.list();
 
         if (orgs && orgs.length > 0) {
-          // Já existe pelo menos uma organização! Define a primeira como ativa.
           await authClient.organization.setActive({
             organizationId: orgs[0].id,
           });
-          // E depois manda de volta para a dashboard/organização
           router.push("/organization");
         } else {
-          // Se não houver, exibe o form de criação
           setIsLoading(false);
         }
       } catch (error) {

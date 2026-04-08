@@ -11,7 +11,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
-import { branch } from "./organization";
 import { churchMember } from "./people";
 import { relations } from "drizzle-orm";
 
@@ -28,9 +27,6 @@ export const financeAccount = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: uuid("branch_id")
-      .notNull()
-      .references(() => branch.id),
     bankId: integer("bank_id").references(() => bank.id),
     name: text("name").notNull(),
     agency: text("agency"),
@@ -44,7 +40,6 @@ export const financeAccount = pgTable(
   },
   (table) => [
     index("account_organizationId_idx").on(table.organizationId),
-    index("account_branchId_idx").on(table.branchId),
     index("account_bankId_idx").on(table.bankId),
   ],
 );
@@ -144,9 +139,6 @@ export const financeTransaction = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
-    branchId: uuid("branch_id")
-      .notNull()
-      .references(() => branch.id),
     financeAccountId: uuid("finance_account_id")
       .notNull()
       .references(() => financeAccount.id),
@@ -181,7 +173,6 @@ export const financeTransaction = pgTable(
   },
   (table) => [
     index("transaction_organizationId_idx").on(table.organizationId),
-    index("transaction_branchId_idx").on(table.branchId),
     index("transaction_financeAccountId_idx").on(table.financeAccountId),
     index("transaction_financeChartOfAccountId_idx").on(
       table.financeChartOfAccountId,
@@ -254,10 +245,6 @@ export const financeAccountRelations = relations(
     organization: one(organization, {
       fields: [financeAccount.organizationId],
       references: [organization.id],
-    }),
-    branch: one(branch, {
-      fields: [financeAccount.branchId],
-      references: [branch.id],
     }),
     bank: one(bank, {
       fields: [financeAccount.bankId],

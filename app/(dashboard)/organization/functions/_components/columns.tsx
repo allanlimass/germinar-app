@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RoleActionCell } from "./function-action-cell";
-import { ChurchFunctionSchema } from "@/lib/validations/functions";
+import { FunctionActionCell } from "./function-action-cell";
+import { ChurchFunctionSchema } from "@/lib/validations/function";
 
 export const columns: ColumnDef<ChurchFunctionSchema>[] = [
   {
@@ -45,7 +45,7 @@ export const columns: ColumnDef<ChurchFunctionSchema>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <RoleActionCell path="/organization/functions" id={row.original.id} />
+      <FunctionActionCell path="/organization/functions" id={row.original.id} />
     ),
   },
 ];

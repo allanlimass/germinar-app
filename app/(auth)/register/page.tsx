@@ -1,8 +1,21 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
-import { RegisterForm } from "@/components/forms/register-form";
+import { RegisterForm } from "./_components/register-form";
+import { db } from "@/db";
+import { invitation } from "@/db/schema/auth";
+import { eq } from "drizzle-orm";
 
-export default function SignupPage() {
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: { invitationId?: string };
+}) {
+  const { invitationId } = await searchParams;
+
+  const result = await db.query.invitation.findFirst({
+    where: eq(invitation.id, invitationId || ""),
+  });
+
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -12,7 +25,11 @@ export default function SignupPage() {
           </div>
           Germinar
         </a>
-        <RegisterForm />
+        <RegisterForm
+          invitationId={invitationId}
+          email={result?.email}
+          status={result?.status}
+        />
       </div>
     </div>
   );

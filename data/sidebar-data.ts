@@ -27,8 +27,8 @@ export const data = {
           url: "/organization",
         },
         {
-          title: "Filiais",
-          url: "/organization/branches",
+          title: "Igrejas",
+          url: "/organization/churches",
         },
         {
           title: "Cargos",
@@ -37,10 +37,6 @@ export const data = {
         {
           title: "Funções",
           url: "/organization/functions",
-        },
-        {
-          title: "Usuários",
-          url: "/organization/users",
         },
       ],
     },
@@ -51,11 +47,11 @@ export const data = {
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/administrative",
         },
         {
           title: "Usuários",
-          url: "#",
+          url: "/administrative/users",
         },
       ],
     },
@@ -66,7 +62,7 @@ export const data = {
       items: [
         {
           title: "Dashboard",
-          url: "/people/dashboard",
+          url: "/people",
         },
         {
           title: "Membresia",

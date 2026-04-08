@@ -27,7 +27,7 @@ import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
 import { slugify } from "@/lib/utils/services";
-import { authClient } from "@/lib/auth/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { organizationFormSchema } from "@/lib/validations/organization";
@@ -42,6 +42,8 @@ export default function OrganizationForm() {
     defaultValues: {
       name: "",
       slug: "",
+      type: "headquarters",
+      path: "1",
     },
   });
 
@@ -65,6 +67,8 @@ export default function OrganizationForm() {
       {
         name: data.name,
         slug: data.slug,
+        type: data.type,
+        path: data.path,
       },
       {
         onSuccess: async (ctx) => {
@@ -163,7 +167,7 @@ export default function OrganizationForm() {
                     {form.formState.isSubmitting ? (
                       <Loader2Icon className="h-4 w-4 animate-spin" />
                     ) : (
-                      "Cadastrar"
+                      "Criar"
                     )}
                   </Button>
                 </Field>

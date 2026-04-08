@@ -8,7 +8,7 @@ import {
   insertChurchFunctionSchema,
   updateChurchFunctionSchema,
   deleteChurchFunctionSchema,
-} from "@/lib/validations/functions";
+} from "@/lib/validations/function";
 
 export const createChurchFunction = actionClient
   .inputSchema(insertChurchFunctionSchema)
