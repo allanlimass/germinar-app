@@ -4,12 +4,12 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { branch } from "@/db/schema/organization";
-import { BranchActionCell } from "./branch-action-cell";
+import { organization } from "@/db/schema/auth";
+import { ChurchActionCell } from "./church-action-cell";
 
-export type Branch = typeof branch.$inferSelect;
+export type Church = typeof organization.$inferSelect;
 
-export const columns: ColumnDef<Branch>[] = [
+export const columns: ColumnDef<Church>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -39,13 +39,17 @@ export const columns: ColumnDef<Branch>[] = [
     ),
   },
   {
-    accessorKey: "isHeadquarter",
+    accessorKey: "type",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tipo" />
     ),
     cell: ({ row }) => {
-      const isHeadquarter = row.getValue("isHeadquarter") as boolean;
-      return isHeadquarter ? "Matriz" : "Filial";
+      const type = row.getValue("type") as string;
+      return type === "headquarters"
+        ? "Matriz"
+        : type === "regional"
+          ? "Regional"
+          : "Local";
     },
   },
   {
@@ -76,9 +80,9 @@ export const columns: ColumnDef<Branch>[] = [
     id: "actions",
     cell: ({ row }) => {
       const id = row.original.id;
-      const path = "/organization/branches";
+      const path = "/organization/churches";
 
-      return <BranchActionCell id={id} path={path} />;
+      return <ChurchActionCell id={id} path={path} />;
     },
   },
 ];

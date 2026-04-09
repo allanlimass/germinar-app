@@ -15,35 +15,27 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
-import z from "zod";
-
-import { slugify } from "@/lib/utils/services";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { organizationFormSchema } from "@/lib/validations/organization";
-
-type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
+import {
+  churchFormSchema,
+  CreateChurchInput,
+} from "@/lib/validations/organization";
+import { slugify } from "@/lib/utils/services";
 
 export default function OrganizationForm() {
   const router = useRouter();
 
-  const form = useForm<OrganizationFormValues>({
-    resolver: zodResolver(organizationFormSchema),
+  const form = useForm<CreateChurchInput>({
+    resolver: zodResolver(churchFormSchema),
     defaultValues: {
-      name: "",
-      slug: "",
       type: "headquarters",
-      path: "1",
+      name: "",
     },
   });
 
@@ -52,9 +44,6 @@ export default function OrganizationForm() {
     form.setValue("name", value, {
       shouldValidate: true,
     });
-    form.setValue("slug", slugify(value), {
-      shouldValidate: false,
-    });
   };
 
   const handleLogout = async () => {
@@ -62,13 +51,12 @@ export default function OrganizationForm() {
     router.push("/login");
   };
 
-  const onSubmit = async (data: OrganizationFormValues) => {
+  const onSubmit = async (data: CreateChurchInput) => {
     await authClient.organization.create(
       {
+        type: "headquarters",
         name: data.name,
-        slug: data.slug,
-        type: data.type,
-        path: data.path,
+        slug: slugify(data.name),
       },
       {
         onSuccess: async (ctx) => {
@@ -79,14 +67,22 @@ export default function OrganizationForm() {
             return;
           }
 
+          await authClient.organization.update({
+            organizationId,
+            data: {
+              path: organizationId,
+            },
+          });
+
           await authClient.organization.setActive({
             organizationId,
           });
           toast.success("Organização criada com sucesso!");
-          router.push("/organization");
+          router.push("/organization/churches");
         },
         onError: (ctx) => {
           toast.error(ctx.error.message);
+          console.error(ctx.error);
         },
       },
     );
@@ -107,43 +103,13 @@ export default function OrganizationForm() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>
-                      Nome da Organização
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Nome da Matriz</FieldLabel>
                     <Input
                       id={field.name}
                       {...field}
                       onChange={onChangeName}
-                      placeholder="Digite o nome da sua organização"
+                      placeholder="Digite o nome da matriz"
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="slug"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <div className="flex items-center">
-                      <FieldLabel htmlFor={field.name}>Subdomínio</FieldLabel>
-                    </div>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        {...field}
-                        placeholder=""
-                        disabled
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <span className="text-muted-foreground">
-                          .germinar.app
-                        </span>
-                      </InputGroupAddon>
-                    </InputGroup>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}

@@ -6,6 +6,7 @@ import {
   boolean,
   index,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -81,6 +82,12 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+export const organizationType = pgEnum("organization_type", [
+  "headquarters",
+  "regional",
+  "local",
+]);
+
 export const organization = pgTable(
   "organization",
   {
@@ -90,10 +97,25 @@ export const organization = pgTable(
     logo: text("logo"),
     createdAt: timestamp("created_at").notNull(),
     metadata: text("metadata"),
-    type: text("type").notNull(),
-    path: text("path").notNull(),
+    type: organizationType("type").notNull(),
+    path: text("path"),
+    cnpj: text("cnpj"),
+    email: text("email"),
+    phone: text("phone"),
+    street: text("street"),
+    number: text("number"),
+    complement: text("complement"),
+    neighborhood: text("neighborhood"),
+    city: text("city"),
+    state: text("state"),
+    zipCode: text("zip_code"),
   },
-  (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
+  (table) => [
+    uniqueIndex("organization_slug_uidx").on(table.slug),
+    index("organization_cnpj_uidx").on(table.cnpj),
+    index("organization_city_uidx").on(table.city),
+    index("organization_state_uidx").on(table.state),
+  ],
 );
 
 export const member = pgTable(

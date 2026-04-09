@@ -1,4 +1,7 @@
-import { deleteChurchFunction } from "@/actions/functions";
+import {
+  deleteChurchAction,
+  setActiveChurchAction,
+} from "@/actions/church-actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,11 +13,13 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Trash2Icon } from "lucide-react";
+import { EyeIcon, Trash2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { deleteChurchSchema } from "@/lib/validations/organization";
+import z from "zod";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,12 +30,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, PencilIcon, TrashIcon } from "lucide-react";
 
-interface UserActionCellProps {
+interface ChurchActionCellProps {
   id: string;
   path: string;
 }
 
-export function UserActionCell({ id, path }: UserActionCellProps) {
+export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -38,19 +43,33 @@ export function UserActionCell({ id, path }: UserActionCellProps) {
     router.push(`${path}/${id}`);
   };
 
-  const deleteAction = useAction(deleteChurchFunction, {
+  const setActiveChurch = useAction(setActiveChurchAction, {
     onSuccess: () => {
-      toast.success("Usuário excluído com sucesso!");
+      toast.success("Igreja acessada com sucesso!");
+      router.refresh();
+    },
+    onError: (ctx) => {
+      toast.error("Erro ao acessar igreja: " + ctx.error.serverError);
+    },
+  });
+
+  const handleAccess = (data: { organizationId: string }) => {
+    setActiveChurch.execute(data);
+  };
+
+  const deleteChurch = useAction(deleteChurchAction, {
+    onSuccess: () => {
+      toast.success("Igreja excluída com sucesso!");
       router.refresh();
       setOpen(false);
     },
     onError: ({ error }) => {
-      toast.error("Erro ao excluir usuário: " + error.serverError);
+      toast.error("Erro ao excluir igreja: " + error.serverError);
     },
   });
 
-  const handleDelete = () => {
-    deleteAction.execute({ id });
+  const handleDelete = (data: z.infer<typeof deleteChurchSchema>) => {
+    deleteChurch.execute(data);
   };
 
   return (
@@ -68,7 +87,10 @@ export function UserActionCell({ id, path }: UserActionCellProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel variant="outline">Cancelar</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => handleDelete({ id })}
+            >
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -83,6 +105,13 @@ export function UserActionCell({ id, path }: UserActionCellProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => handleAccess({ organizationId: id })}
+            className="cursor-pointer"
+          >
+            <EyeIcon className="mr-2 h-4 w-4" />
+            Acessar
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
             <PencilIcon className="mr-2 h-4 w-4" />
             Editar

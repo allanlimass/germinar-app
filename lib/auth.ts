@@ -42,7 +42,57 @@ export const auth = betterAuth({
             path: {
               type: "string",
               input: true,
-              required: true,
+              required: false,
+            },
+            cnpj: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            email: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            phone: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            street: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            number: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            complement: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            neighborhood: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            city: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            state: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            zipCode: {
+              type: "string",
+              input: true,
+              required: false,
             },
           },
         },

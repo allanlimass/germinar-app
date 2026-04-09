@@ -6,13 +6,31 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { db } from "@/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import React from "react";
+import { eq } from "drizzle-orm";
+import { organization } from "@/db/schema/auth";
 
-export default function PrivateLayout({
+export default async function PrivateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const organizationId = session?.session?.activeOrganizationId;
+
+  const organizationName = await db.query.organization.findFirst({
+    where: eq(organization.id, organizationId),
+    columns: {
+      name: true,
+    },
+  });
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -26,6 +44,7 @@ export default function PrivateLayout({
             />
             <BreadcrumbItem>
               <BreadcrumbPage>Dashboard</BreadcrumbPage>
+              {organizationName?.name}
             </BreadcrumbItem>
           </div>
         </header>
