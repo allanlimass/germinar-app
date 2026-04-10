@@ -33,7 +33,7 @@ import {
   ChurchDbSchema,
   createChurchSchema,
   updateChurchSchema,
-} from "@/lib/validations/organization";
+} from "@/lib/validations/church";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -64,6 +64,8 @@ export function UpsertChurchForm({
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
+  const parentId = initialData?.path?.split(".").slice(0, -1).join(".");
+
   const form = useForm<CreateChurchInput | UpdateChurchInput>({
     resolver: zodResolver(isEditing ? updateChurchSchema : createChurchSchema),
     defaultValues: {
@@ -83,6 +85,7 @@ export function UpsertChurchForm({
       neighborhood: initialData?.neighborhood || "",
       city: initialData?.city || "",
       state: initialData?.state || "",
+      parentId: parentId || "",
     },
   });
 

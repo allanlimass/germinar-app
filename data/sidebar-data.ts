@@ -12,6 +12,8 @@ import {
   StoreIcon,
   BuildingIcon,
   UsersIcon,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 export const data = {

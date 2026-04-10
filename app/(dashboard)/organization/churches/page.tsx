@@ -1,12 +1,16 @@
 import { DataTable } from "@/components/data-table";
-import { listChurchesByUserId } from "@/db/queries/churches";
 import { columns } from "./_components/columns";
-import { getSessionContext } from "@/lib/utils/db-utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function ChurchesPage() {
-  const { session } = await getSessionContext();
+  const churches = await auth.api.listOrganizations({
+    headers: await headers(),
+  });
 
-  const churches = await listChurchesByUserId(session.user?.id);
+  if (!churches) {
+    return [];
+  }
 
   return (
     <DataTable

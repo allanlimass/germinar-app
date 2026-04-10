@@ -22,10 +22,7 @@ import { Controller, useForm } from "react-hook-form";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import {
-  churchFormSchema,
-  CreateChurchInput,
-} from "@/lib/validations/organization";
+import { churchFormSchema, CreateChurchInput } from "@/lib/validations/church";
 import { slugify } from "@/lib/utils/services";
 
 export default function OrganizationForm() {

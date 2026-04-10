@@ -6,7 +6,7 @@ import { InvitationSchema } from "@/lib/validations/invitation";
 
 export type UserAndInvitation = InvitationSchema;
 
-export const getMembers = async (): Promise<UserAndInvitation[]> => {
+export const listUsers = async (): Promise<UserAndInvitation[]> => {
   const { organizationId } = await getSessionContext();
 
   const members = await db.query.member.findMany({
