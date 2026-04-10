@@ -5,7 +5,7 @@ import {
   createChurchSchema,
   updateChurchSchema,
   deleteChurchSchema,
-} from "@/lib/validations/church";
+} from "@/lib/validators/church";
 import { slugify } from "@/lib/utils/services";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

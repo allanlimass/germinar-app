@@ -1,7 +1,7 @@
 import {
   deleteChurchAction,
-  setActiveChurchAction,
 } from "@/actions/church-actions";
+import { authClient } from "@/lib/auth-client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteChurchSchema } from "@/lib/validations/church";
+import { deleteChurchSchema } from "@/lib/validators/church";
 import z from "zod";
 import {
   DropdownMenu,
@@ -43,18 +43,14 @@ export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
     router.push(`${path}/${id}`);
   };
 
-  const setActiveChurch = useAction(setActiveChurchAction, {
-    onSuccess: () => {
+  const handleAccess = async (organizationId: string) => {
+    try {
+      await authClient.organization.setActive({ organizationId });
       toast.success("Igreja acessada com sucesso!");
       router.refresh();
-    },
-    onError: (ctx) => {
-      toast.error("Erro ao acessar igreja: " + ctx.error.serverError);
-    },
-  });
-
-  const handleAccess = (data: { organizationId: string }) => {
-    setActiveChurch.execute(data);
+    } catch {
+      toast.error("Erro ao acessar igreja.");
+    }
   };
 
   const deleteChurch = useAction(deleteChurchAction, {
@@ -106,7 +102,7 @@ export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => handleAccess({ organizationId: id })}
+            onClick={() => handleAccess(id)}
             className="cursor-pointer"
           >
             <EyeIcon className="mr-2 h-4 w-4" />

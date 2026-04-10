@@ -33,7 +33,7 @@ import {
   ChurchDbSchema,
   createChurchSchema,
   updateChurchSchema,
-} from "@/lib/validations/church";
+} from "@/lib/validators/church";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";

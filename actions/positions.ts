@@ -8,7 +8,7 @@ import {
   insertChurchPositionSchema,
   updateChurchPositionSchema,
   deleteChurchPositionSchema,
-} from "@/lib/validations/position";
+} from "@/lib/validators/position";
 
 export const createChurchPosition = actionClient
   .inputSchema(insertChurchPositionSchema)

@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { RegisterFormValues, registerSchema } from "@/lib/validations/register";
+import { RegisterFormValues, registerSchema } from "@/lib/validators/register";
 
 interface RegisterFormProps {
   invitationId?: string;

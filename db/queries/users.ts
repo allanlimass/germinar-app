@@ -2,7 +2,7 @@ import { getSessionContext } from "@/lib/utils/db-utils";
 import { db } from "@/db";
 import { invitation, member } from "@/db/schema/auth";
 import { eq, and } from "drizzle-orm";
-import { InvitationSchema } from "@/lib/validations/invitation";
+import { InvitationSchema } from "@/lib/validators/invitation";
 
 export type UserAndInvitation = InvitationSchema;
 

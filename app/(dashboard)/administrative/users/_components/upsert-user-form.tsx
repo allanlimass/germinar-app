@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import {
   InsertInvitation,
   insertInvitationSchema,
-} from "@/lib/validations/invitation";
+} from "@/lib/validators/invitation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon, Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";

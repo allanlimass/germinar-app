@@ -1,6 +1,4 @@
 import { AppSidebar } from "@/components/layout/app-sidebar";
-import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
@@ -8,6 +6,8 @@ import {
 } from "@/components/ui/sidebar";
 import React from "react";
 import { getSessionContext } from "@/lib/utils/db-utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function PrivateLayout({
   children,
@@ -16,9 +16,13 @@ export default async function PrivateLayout({
 }) {
   const { organizationId } = await getSessionContext();
 
+  const churches = await auth.api.listOrganizations({
+    headers: await headers(),
+  });
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar churches={churches} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
