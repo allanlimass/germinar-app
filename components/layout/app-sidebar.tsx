@@ -16,157 +16,28 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  InboxIcon,
-  TerminalIcon,
-  UsersIcon,
-  Group,
-  ChevronRight,
-  SunIcon,
-  MoonIcon,
-  Church,
-  DollarSign,
-  Megaphone,
-  ArrowDown,
-  ArrowUp,
-  Landmark,
-  Gauge,
-  Users,
-} from "lucide-react";
+import { TerminalIcon, ChevronRight, SunIcon, MoonIcon } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "https://github.com/shadcn.png",
-  },
-  navMain: [
-    {
-      title: "Igreja",
-      url: "#",
-      icon: <Church />,
-      isActive: true,
-      items: [
-        {
-          title: "Dashboard",
-          url: "#",
-          icon: <Gauge />,
-          isActive: false,
-        },
-        {
-          title: "Igrejas",
-          url: "/organization/churches",
-          icon: <Church />,
-          isActive: false,
-        },
-        {
-          title: "Usuários",
-          url: "/administrative/users",
-          icon: <Users />,
-          isActive: false,
-        },
-        {
-          title: "Relatórios",
-          url: "/churches/reports",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-      ],
-    },
-    {
-      title: "Pessoas",
-      url: "#",
-      icon: <UsersIcon />,
-      isActive: false,
-      items: [
-        {
-          title: "Dashboard",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-        {
-          title: "Membros",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-        {
-          title: "Relatórios",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-      ],
-    },
-    {
-      title: "Finanças",
-      url: "#",
-      icon: <DollarSign />,
-      isActive: false,
-      items: [
-        {
-          title: "Dashboard",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-        {
-          title: "Receitas",
-          url: "#",
-          icon: <ArrowDown />,
-          isActive: false,
-        },
-        {
-          title: "Despesas",
-          url: "#",
-          icon: <ArrowUp />,
-          isActive: false,
-        },
-        {
-          title: "Fornecedores",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-        {
-          title: "Plano de Contas",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-        {
-          title: "Contas",
-          url: "#",
-          icon: <Landmark />,
-          isActive: false,
-        },
-        {
-          title: "Relatórios",
-          url: "#",
-          icon: <InboxIcon />,
-          isActive: false,
-        },
-      ],
-    },
-    {
-      title: "Comunicação",
-      url: "#",
-      icon: <Megaphone />,
-      isActive: false,
-    },
-    {
-      title: "Células",
-      url: "#",
-      icon: <Group />,
-      isActive: false,
-    },
-  ],
-};
+import { data } from "@/data/sidebar-data";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  churches,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  user: {
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  churches: {
+    id: string;
+    name: string;
+    logo?: string;
+  }[];
+}) {
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
   const { theme, setTheme } = useTheme();
 
@@ -217,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       isActive={activeItem?.title === item.title}
                       className="px-2.5 md:px-2"
                     >
-                      {item.icon}
+                      <item.icon />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -240,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <span>Tema</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <NavUser user={data.user} />
+          <NavUser user={user} churches={churches} />
         </SidebarFooter>
       </Sidebar>
 
@@ -268,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       isActive={subItem.isActive}
                     >
                       <Link href={subItem.url}>
-                        {subItem.icon}
+                        <subItem.icon />
                         <span>{subItem.title}</span>
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </Link>

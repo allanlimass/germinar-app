@@ -20,3 +20,18 @@ export const getSessionContext = cache(async () => {
 
   return { session, organizationId };
 });
+
+export const getOrganizationsContext = cache(async () => {
+  const listChurches = await auth.api.listOrganizations({
+    headers: await headers(),
+  });
+
+  const churches = listChurches.map((church) => ({
+    id: church.id,
+    name: church.name,
+    type: church.type,
+    logo: church.logo || undefined,
+  }));
+
+  return { churches };
+});
