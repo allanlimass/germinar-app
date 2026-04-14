@@ -32,13 +32,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowDownUp,
   ChevronLeft,
   ChevronRight,
   ColumnsIcon,
   Download,
-  FilterIcon,
-  ListFilter,
   Plus,
   SearchIcon,
 } from "lucide-react";
@@ -55,14 +52,13 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   actionButtonLabel?: string;
   searchableColumn?: string;
-  entityName: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchableColumn,
-  entityName,
+  actionButtonLabel,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -157,7 +153,7 @@ export function DataTable<TData, TValue>({
 
           <Button onClick={handleNew}>
             <Plus className="h-4 w-4" />
-            Adicionar {entityName}
+            Adicionar {actionButtonLabel}
           </Button>
         </div>
       </div>

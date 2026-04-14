@@ -3,9 +3,7 @@ import { db } from "@/db";
 import { churchPosition } from "@/db/schema/people";
 import { and, eq } from "drizzle-orm";
 
-export const getChurchPositions = async () => {
-  const { organizationId } = await getSessionContext();
-
+export const getChurchPositions = async (organizationId: string) => {
   return await db.query.churchPosition.findMany({
     where: eq(churchPosition.organizationId, organizationId),
   });

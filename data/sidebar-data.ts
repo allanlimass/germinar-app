@@ -10,6 +10,8 @@ import {
   Group,
   Users,
   FileText,
+  Award,
+  HandHeart,
 } from "lucide-react";
 
 export const data = {
@@ -36,6 +38,18 @@ export const data = {
           title: "Usuários",
           url: "/organization/users",
           icon: Users,
+          isActive: false,
+        },
+        {
+          title: "Cargos",
+          url: "/organization/positions",
+          icon: Award,
+          isActive: false,
+        },
+        {
+          title: "Funções",
+          url: "/organization/functions",
+          icon: HandHeart,
           isActive: false,
         },
         {

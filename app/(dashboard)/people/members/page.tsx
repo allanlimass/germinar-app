@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/data-table";
-import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { DashboardHeader } from "@/components/layout/header";
 import { columns } from "@/app/(dashboard)/people/members/_components/columns";
 import { listChurchMembers } from "@/db/queries/church-member";
 import { notFound } from "next/navigation";
@@ -18,7 +18,7 @@ export default async function MembersPage() {
       <DataTable
         data={churchMembers}
         columns={columns}
-        entityName="Membro"
+        actionButtonLabel="Membro"
         searchableColumn="name"
       />
     </>

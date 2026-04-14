@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FunctionActionCell } from "./function-action-cell";
-import { ChurchFunctionSchema } from "@/lib/validators/function";
+import { ChurchFunctionSchema } from "@/lib/validations/function";
 
 export const columns: ColumnDef<ChurchFunctionSchema>[] = [
   {

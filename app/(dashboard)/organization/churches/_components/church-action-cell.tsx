@@ -1,6 +1,4 @@
-import {
-  deleteChurchAction,
-} from "@/actions/church-actions";
+import { deleteChurchAction } from "@/actions/church-actions";
 import { authClient } from "@/lib/auth-client";
 import {
   AlertDialog,
@@ -18,7 +16,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteChurchSchema } from "@/lib/validators/church";
+import { deleteChurchSchema } from "@/lib/validations/church";
 import z from "zod";
 import {
   DropdownMenu,

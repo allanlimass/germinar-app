@@ -5,13 +5,13 @@ import { db } from "@/db";
 import { churchPosition } from "@/db/schema/people";
 import { and, eq } from "drizzle-orm";
 import {
-  insertChurchPositionSchema,
+  createChurchPositionSchema,
   updateChurchPositionSchema,
   deleteChurchPositionSchema,
-} from "@/lib/validators/position";
+} from "@/lib/validations/position";
 
 export const createChurchPosition = actionClient
-  .inputSchema(insertChurchPositionSchema)
+  .inputSchema(createChurchPositionSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
 

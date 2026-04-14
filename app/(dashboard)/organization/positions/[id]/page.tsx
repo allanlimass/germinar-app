@@ -9,9 +9,9 @@ export default async function EditChurchPositionPage({
 }) {
   const { id } = await params;
 
-  const churchPositionData = await getChurchPositionById(id);
+  const churchPosition = await getChurchPositionById(id);
 
-  if (!churchPositionData) notFound();
+  if (!churchPosition) notFound();
 
-  return <UpsertChurchPositionForm initialData={churchPositionData} />;
+  return <UpsertChurchPositionForm initialData={churchPosition} />;
 }
