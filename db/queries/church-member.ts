@@ -3,7 +3,7 @@ import { churchMember } from "@/db/schema/people";
 import { getSessionContext } from "@/lib/utils/db-utils";
 import { and, eq } from "drizzle-orm";
 
-export const getChurchMembers = async () => {
+export const listChurchMembers = async () => {
   const { organizationId } = await getSessionContext();
 
   return await db.query.churchMember.findMany({

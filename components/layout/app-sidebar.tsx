@@ -131,7 +131,7 @@ export function AppSidebar({
                 {activeItem?.items?.map((subItem) => (
                   <SidebarMenuItem
                     key={subItem.title}
-                    className="py-2.5 md:py-1"
+                    className="py-2.5 md:py-0.5"
                   >
                     <SidebarMenuButton
                       asChild

@@ -4,25 +4,25 @@ import {
   Church,
   DollarSign,
   Megaphone,
-  ArrowDown,
-  ArrowUp,
+  ArrowDownUp,
   Landmark,
   Gauge,
   Group,
   Users,
+  FileText,
 } from "lucide-react";
 
 export const data = {
   navMain: [
     {
-      title: "Igreja",
+      title: "Organização",
       url: "#",
       icon: Church,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/organization",
           icon: Gauge,
           isActive: false,
         },
@@ -34,14 +34,14 @@ export const data = {
         },
         {
           title: "Usuários",
-          url: "/administrative/users",
+          url: "/organization/users",
           icon: Users,
           isActive: false,
         },
         {
           title: "Relatórios",
-          url: "/churches/reports",
-          icon: Inbox,
+          url: "/organization/reports",
+          icon: FileText,
           isActive: false,
         },
       ],
@@ -55,19 +55,19 @@ export const data = {
         {
           title: "Dashboard",
           url: "#",
-          icon: Inbox,
+          icon: Gauge,
           isActive: false,
         },
         {
           title: "Membros",
-          url: "#",
-          icon: Inbox,
+          url: "/people/members",
+          icon: Users,
           isActive: false,
         },
         {
           title: "Relatórios",
           url: "#",
-          icon: Inbox,
+          icon: FileText,
           isActive: false,
         },
       ],
@@ -81,19 +81,13 @@ export const data = {
         {
           title: "Dashboard",
           url: "#",
-          icon: Inbox,
+          icon: Gauge,
           isActive: false,
         },
         {
-          title: "Receitas",
+          title: "Transações",
           url: "#",
-          icon: ArrowDown,
-          isActive: false,
-        },
-        {
-          title: "Despesas",
-          url: "#",
-          icon: ArrowUp,
+          icon: ArrowDownUp,
           isActive: false,
         },
         {
@@ -104,6 +98,12 @@ export const data = {
         },
         {
           title: "Plano de Contas",
+          url: "#",
+          icon: Inbox,
+          isActive: false,
+        },
+        {
+          title: "Centros de Custo",
           url: "#",
           icon: Inbox,
           isActive: false,
