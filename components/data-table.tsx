@@ -233,10 +233,13 @@ export function DataTable<TData, TValue>({
           {Array.from({ length: table.getPageCount() }).map((_, index) => (
             <Button
               key={index}
-              variant="outline"
+              variant={
+                table.getState().pagination.pageIndex === index
+                  ? "default"
+                  : "outline"
+              }
               size="sm"
               onClick={() => table.setPageIndex(index)}
-              disabled={!table.getCanPreviousPage()}
             >
               {index + 1}
             </Button>
