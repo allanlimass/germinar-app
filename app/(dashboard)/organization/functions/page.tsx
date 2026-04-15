@@ -1,16 +1,25 @@
 import { DataTable } from "@/components/data-table";
-import { getChurchFunctions } from "@/db/queries/function";
-import { columns } from "./_components/columns";
+import { listChurchFunctions } from "@/db/queries/function";
+import { churchFunctionColumns } from "./_components/function-columns";
+import { getSessionContext } from "@/lib/utils/db-utils";
+import { DashboardHeader } from "@/components/layout/header";
 
 export default async function ChurchFunctionsPage() {
-  const churchFunctions = await getChurchFunctions();
+  const { organizationId } = await getSessionContext();
+  const churchFunctions = await listChurchFunctions(organizationId);
 
   return (
-    <DataTable
-      columns={columns}
-      data={churchFunctions}
-      actionButtonLabel="Função"
-      searchableColumn="name"
-    />
+    <>
+      <DashboardHeader
+        heading="Funções"
+        text="Gerencie as funções da sua igreja"
+      />
+      <DataTable
+        columns={churchFunctionColumns}
+        data={churchFunctions}
+        actionButtonLabel="Função"
+        searchableColumn="name"
+      />
+    </>
   );
 }

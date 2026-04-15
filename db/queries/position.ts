@@ -10,9 +10,10 @@ export const getChurchPositions = async (organizationId: string) => {
   });
 };
 
-export const getChurchPositionById = async (id: string) => {
-  const { organizationId } = await getSessionContext();
-
+export const getChurchPositionById = async (
+  id: string,
+  organizationId: string,
+) => {
   return await db.query.churchPosition.findFirst({
     where: and(
       eq(churchPosition.id, id),

@@ -5,17 +5,20 @@ import { db } from "@/db";
 import { churchFunction } from "@/db/schema/people";
 import { and, eq } from "drizzle-orm";
 import {
-  insertChurchFunctionSchema,
+  createChurchFunctionSchema,
   updateChurchFunctionSchema,
   deleteChurchFunctionSchema,
 } from "@/lib/validations/function";
+import { revalidatePath } from "next/cache";
 
 export const createChurchFunction = actionClient
-  .inputSchema(insertChurchFunctionSchema)
+  .inputSchema(createChurchFunctionSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
 
-    await db.insert(churchFunction).values({ organizationId, ...parsedInput });
+    revalidatePath("/organization/functions");
+
+    await db.insert(churchFunction).values({ ...parsedInput, organizationId });
   });
 
 export const updateChurchFunction = actionClient
@@ -23,6 +26,8 @@ export const updateChurchFunction = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
     const { id, ...data } = parsedInput;
+
+    revalidatePath("/organization/functions");
 
     await db
       .update(churchFunction)
@@ -40,6 +45,8 @@ export const deleteChurchFunction = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
     const { id } = parsedInput;
+
+    revalidatePath("/organization/functions");
 
     await db
       .delete(churchFunction)

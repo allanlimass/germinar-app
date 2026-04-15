@@ -1,31 +1,30 @@
-import { churchFunction } from "@/db/schema/people";
-import z from "zod";
+import { z } from "zod";
 
-const churchFunctionSchema = z.object({
+export const churchFunctionFormSchema = z.object({
   id: z.uuid(),
-  organizationId: z.uuid(),
-  name: z.string().min(1, "O nome é obrigatório"),
-  description: z.string().optional(),
-  createdAt: z.date(),
+  name: z.string().min(1, "O campo é obrigatório"),
+  description: z
+    .string()
+    .trim()
+    .nullable()
+    .transform((value) => (value === "" || value === undefined ? null : value)),
 });
 
-export const insertChurchFunctionSchema = churchFunctionSchema.omit({
+export const createChurchFunctionSchema = churchFunctionFormSchema.omit({
   id: true,
-  organizationId: true,
-  createdAt: true,
 });
-
-export const updateChurchFunctionSchema = churchFunctionSchema.omit({
-  organizationId: true,
-  createdAt: true,
-});
-
-export const deleteChurchFunctionSchema = churchFunctionSchema.pick({
+export const updateChurchFunctionSchema = churchFunctionFormSchema;
+export const deleteChurchFunctionSchema = churchFunctionFormSchema.pick({
   id: true,
 });
 
-export type InsertChurchFunction = z.infer<typeof insertChurchFunctionSchema>;
-export type UpdateChurchFunction = z.infer<typeof updateChurchFunctionSchema>;
-export type DeleteChurchFunction = z.infer<typeof deleteChurchFunctionSchema>;
-
-export type ChurchFunctionSchema = typeof churchFunction.$inferSelect;
+export type ChurchFunctionFormSchema = z.infer<typeof churchFunctionFormSchema>;
+export type CreateChurchFunctionSchema = z.infer<
+  typeof createChurchFunctionSchema
+>;
+export type UpdateChurchFunctionSchema = z.infer<
+  typeof updateChurchFunctionSchema
+>;
+export type DeleteChurchFunctionSchema = z.infer<
+  typeof deleteChurchFunctionSchema
+>;

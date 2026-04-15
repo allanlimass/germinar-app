@@ -5,9 +5,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FunctionActionCell } from "./function-action-cell";
-import { ChurchFunctionSchema } from "@/lib/validations/function";
+import { ChurchFunctionFormSchema } from "@/lib/validations/function";
+import { format } from "date-fns";
 
-export const columns: ColumnDef<ChurchFunctionSchema>[] = [
+export const churchFunctionColumns: ColumnDef<ChurchFunctionFormSchema>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -41,6 +42,13 @@ export const columns: ColumnDef<ChurchFunctionSchema>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Descrição" />
     ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Criado em" />
+    ),
+    cell: ({ row }) => format(row.getValue("createdAt"), "dd/MM/yyyy HH:mm:ss"),
   },
   {
     id: "actions",

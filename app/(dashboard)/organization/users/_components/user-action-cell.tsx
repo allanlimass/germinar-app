@@ -1,4 +1,4 @@
-import { deleteChurchFunction } from "@/actions/functions";
+import { deleteChurchFunction } from "@/actions/function-actions";
 import {
   AlertDialog,
   AlertDialogAction,
