@@ -1,34 +1,30 @@
-import { churchPosition } from "@/db/schema/people";
-import z from "zod";
+import { z } from "zod";
 
-const formOptionalString = z
-  .literal("")
-  .transform(() => undefined)
-  .or(z.string().optional());
-
-const churchPositionSchema = z.object({
-  name: z.string().min(1, "O nome é obrigatório"),
-  description: formOptionalString,
-});
-
-export const createChurchPositionSchema = churchPositionSchema;
-
-export const updateChurchPositionSchema = churchPositionSchema.extend({
+export const churchPositionFormSchema = z.object({
   id: z.uuid(),
+  name: z.string().min(1, "O campo é obrigatório"),
+  description: z
+    .string()
+    .trim()
+    .nullable()
+    .transform((value) => (value === "" || value === undefined ? null : value)),
 });
 
-export const deleteChurchPositionSchema = churchPositionSchema.extend({
-  id: z.uuid(),
+export const createChurchPositionSchema = churchPositionFormSchema.omit({
+  id: true,
+});
+export const updateChurchPositionSchema = churchPositionFormSchema;
+export const deleteChurchPositionSchema = churchPositionFormSchema.pick({
+  id: true,
 });
 
-export type CreateChurchPositionInput = z.infer<
+export type ChurchPositionFormSchema = z.infer<typeof churchPositionFormSchema>;
+export type CreateChurchPositionSchema = z.infer<
   typeof createChurchPositionSchema
 >;
-export type UpdateChurchPositionInput = z.infer<
+export type UpdateChurchPositionSchema = z.infer<
   typeof updateChurchPositionSchema
 >;
-export type DeleteChurchPositionInput = z.infer<
+export type DeleteChurchPositionSchema = z.infer<
   typeof deleteChurchPositionSchema
 >;
-
-export type ChurchPositionSchema = typeof churchPosition.$inferSelect;

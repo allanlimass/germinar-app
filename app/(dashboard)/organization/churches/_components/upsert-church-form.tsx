@@ -188,7 +188,7 @@ export function UpsertChurchForm({
                           Igreja Vinculada
                         </FieldLabel>
                         <Select
-                          value={field.value}
+                          value={field.value ?? ""}
                           onValueChange={(value) => {
                             field.onChange(value);
                             const selected = headquarters.find(
@@ -232,7 +232,7 @@ export function UpsertChurchForm({
                             Igreja Vinculada
                           </FieldLabel>
                           <Select
-                            value={field.value}
+                            value={field.value ?? ""}
                             onValueChange={(value) => {
                               field.onChange(value);
                               const selected = allParents.find(
@@ -311,6 +311,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o CNPJ"
                         maxLength={18}
                         onChange={(e) =>
@@ -335,6 +336,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o email"
                       />
                       {fieldState.invalid && (
@@ -353,6 +355,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o telefone"
                         maxLength={15}
                         onChange={(e) =>
@@ -377,6 +380,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o CEP"
                         maxLength={9}
                         onChange={(e) =>
@@ -399,6 +403,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite a rua"
                       />
                       {fieldState.invalid && (
@@ -417,6 +422,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o número"
                       />
                       {fieldState.invalid && (
@@ -437,6 +443,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o complemento"
                       />
                       {fieldState.invalid && (
@@ -455,6 +462,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite o bairro"
                       />
                       {fieldState.invalid && (
@@ -473,6 +481,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite a cidade"
                       />
                       {fieldState.invalid && (
@@ -489,7 +498,7 @@ export function UpsertChurchForm({
                     <Field>
                       <FieldLabel htmlFor={field.name}>UF</FieldLabel>
                       <Select
-                        value={field.value}
+                        value={field.value ?? ""}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger>

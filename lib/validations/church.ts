@@ -2,13 +2,13 @@ import { z } from "zod";
 
 const formOptionalString = z
   .literal("")
-  .transform(() => undefined)
-  .or(z.string().optional());
+  .transform(() => null)
+  .or(z.string().nullable().optional());
 
 const formOptionalEmail = z
   .literal("")
-  .transform(() => undefined)
-  .or(z.string().email().optional());
+  .transform(() => null)
+  .or(z.string().email().nullable().optional());
 
 const dbOptionalString = z
   .string()
@@ -39,8 +39,10 @@ export const churchFormSchema = z.object({
   city: formOptionalString,
   state: z
     .literal("")
-    .transform(() => undefined)
-    .or(z.string().max(2, "Use a sigla do estado (Ex: SP)").optional()),
+    .transform(() => null)
+    .or(
+      z.string().max(2, "Use a sigla do estado (Ex: SP)").nullable().optional(),
+    ),
   zipCode: formOptionalString,
 });
 

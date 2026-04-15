@@ -5,9 +5,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PositionActionCell } from "./position-action-cell";
-import { ChurchPositionSchema } from "@/lib/validations/position";
+import { ChurchPositionFormSchema } from "@/lib/validations/position";
 
-export const columns: ColumnDef<ChurchPositionSchema>[] = [
+export const churchPositionColumns: ColumnDef<ChurchPositionFormSchema>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -40,6 +40,12 @@ export const columns: ColumnDef<ChurchPositionSchema>[] = [
     accessorKey: "description",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Descrição" />
+    ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Criado em" />
     ),
   },
   {

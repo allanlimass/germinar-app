@@ -9,11 +9,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  ChurchPositionSchema,
-  CreateChurchPositionInput,
-  UpdateChurchPositionInput,
+  ChurchPositionFormSchema,
+  CreateChurchPositionSchema,
   createChurchPositionSchema,
-  updateChurchPositionSchema,
 } from "@/lib/validations/position";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
@@ -29,7 +27,7 @@ import {
 import { DashboardHeader } from "@/components/layout/header";
 
 interface UpsertChurchPositionFormProps {
-  initialData?: ChurchPositionSchema;
+  initialData?: ChurchPositionFormSchema;
 }
 
 export function UpsertChurchPositionForm({
@@ -40,13 +38,11 @@ export function UpsertChurchPositionForm({
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
-  const form = useForm<CreateChurchPositionInput | UpdateChurchPositionInput>({
-    resolver: zodResolver(
-      isEditing ? updateChurchPositionSchema : createChurchPositionSchema,
-    ),
+  const form = useForm<CreateChurchPositionSchema>({
+    resolver: zodResolver(createChurchPositionSchema),
     defaultValues: {
-      name: initialData?.name || "",
-      description: initialData?.description || "",
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
     },
   });
 
@@ -79,9 +75,7 @@ export function UpsertChurchPositionForm({
     },
   });
 
-  const onSubmit = (
-    data: CreateChurchPositionInput | UpdateChurchPositionInput,
-  ) => {
+  const onSubmit = (data: CreateChurchPositionSchema) => {
     if (isEditing && initialData) {
       updateChurchPositionAction.execute({ ...data, id: initialData.id });
     } else {
@@ -136,6 +130,7 @@ export function UpsertChurchPositionForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="Digite a descrição"
                       />
                       {fieldState.invalid && (
