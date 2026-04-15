@@ -9,12 +9,14 @@ import {
   updateChurchPositionSchema,
   deleteChurchPositionSchema,
 } from "@/lib/validations/position";
-import z from "zod";
+import { revalidatePath } from "next/cache";
 
 export const createChurchPosition = actionClient
   .inputSchema(createChurchPositionSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
+
+    revalidatePath("/organization/positions");
 
     await db.insert(churchPosition).values({ ...parsedInput, organizationId });
   });
@@ -25,7 +27,9 @@ export const updateChurchPosition = actionClient
     const { organizationId } = ctx;
     const { id, ...data } = parsedInput;
 
-    return await db
+    revalidatePath("/organization/positions");
+
+    await db
       .update(churchPosition)
       .set(data)
       .where(
@@ -33,8 +37,7 @@ export const updateChurchPosition = actionClient
           eq(churchPosition.id, id),
           eq(churchPosition.organizationId, organizationId),
         ),
-      )
-      .returning();
+      );
   });
 
 export const deleteChurchPosition = actionClient
@@ -42,6 +45,8 @@ export const deleteChurchPosition = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
     const { id } = parsedInput;
+
+    revalidatePath("/organization/positions");
 
     await db
       .delete(churchPosition)

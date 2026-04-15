@@ -51,7 +51,6 @@ export function UpsertChurchPositionForm({
       toast.success("Cargo criado com sucesso!");
       if (submitTypeRef.current === "continue") {
         form.reset();
-        router.refresh();
         return;
       }
       router.push("/organization/positions");
@@ -65,7 +64,6 @@ export function UpsertChurchPositionForm({
     onSuccess: () => {
       toast.success("Cargo atualizado com sucesso!");
       if (submitTypeRef.current === "continue") {
-        router.refresh();
         return;
       }
       router.push("/organization/positions");

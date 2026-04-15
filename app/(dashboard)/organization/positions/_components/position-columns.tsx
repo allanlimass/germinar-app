@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PositionActionCell } from "./position-action-cell";
 import { ChurchPositionFormSchema } from "@/lib/validations/position";
+import { format } from "date-fns";
 
 export const churchPositionColumns: ColumnDef<ChurchPositionFormSchema>[] = [
   {
@@ -47,6 +48,7 @@ export const churchPositionColumns: ColumnDef<ChurchPositionFormSchema>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Criado em" />
     ),
+    cell: ({ row }) => format(row.getValue("createdAt"), "dd/MM/yyyy HH:mm:ss"),
   },
   {
     id: "actions",

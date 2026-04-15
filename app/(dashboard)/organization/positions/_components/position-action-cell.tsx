@@ -41,7 +41,6 @@ export function PositionActionCell({ id, path }: PositionActionCellProps) {
   const deleteAction = useAction(deleteChurchPosition, {
     onSuccess: () => {
       toast.success("Cargo excluído com sucesso!");
-      router.refresh();
       setOpen(false);
     },
     onError: ({ error }) => {
