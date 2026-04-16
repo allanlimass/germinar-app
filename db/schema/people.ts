@@ -5,6 +5,7 @@ import {
   timestamp,
   index,
   uuid,
+  date,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { relations } from "drizzle-orm";
@@ -43,12 +44,6 @@ export const churchFunction = pgTable(
 
 export const memberTypeEnum = pgEnum("member_type", ["MEMBER", "VISITOR"]);
 export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
-export const maritalStatusEnum = pgEnum("marital_status", [
-  "SINGLE",
-  "MARRIED",
-  "DIVORCED",
-  "WIDOWED",
-]);
 export const memberStatusEnum = pgEnum("member_status", ["ACTIVE", "INACTIVE"]);
 
 export const churchMember = pgTable(
@@ -65,24 +60,33 @@ export const churchMember = pgTable(
         onDelete: "set null",
       },
     ),
+    churchFunctionId: uuid("church_function_id").references(
+      () => churchFunction.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     type: memberTypeEnum("type").default("MEMBER").notNull(),
-    name: text("name").notNull(),
-    birthDate: timestamp("birth_date"),
-    gender: genderEnum("gender"),
-    maritalStatus: maritalStatusEnum("marital_status"),
-    cpf: text("cpf").unique(),
-    profession: text("profession"),
+
     photoUrl: text("photo_url"),
-    phone: text("phone"),
+    name: text("name").notNull(),
+    birthDate: date("birth_date"),
+    gender: genderEnum("gender"),
+    cpf: text("cpf").unique(),
+
     email: text("email").unique(),
+    phone: text("phone"),
+
     zipCode: text("zip_code"),
     street: text("street"),
     number: text("number"),
-    complement: text("complement"),
     neighborhood: text("neighborhood"),
+    complement: text("complement"),
     city: text("city"),
     state: text("state"),
+
     status: memberStatusEnum("status").default("ACTIVE").notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -93,6 +97,7 @@ export const churchMember = pgTable(
     index("churchMember_organizationId_idx").on(table.organizationId),
     index("churchMember_userId_idx").on(table.userId),
     index("churchMember_churchPositionId_idx").on(table.churchPositionId),
+    index("churchMember_churchFunctionId_idx").on(table.churchFunctionId),
   ],
 );
 
@@ -130,5 +135,9 @@ export const churchMemberRelations = relations(churchMember, ({ one }) => ({
   churchPosition: one(churchPosition, {
     fields: [churchMember.churchPositionId],
     references: [churchPosition.id],
+  }),
+  churchFunction: one(churchFunction, {
+    fields: [churchMember.churchFunctionId],
+    references: [churchFunction.id],
   }),
 }));

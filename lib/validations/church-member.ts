@@ -1,51 +1,53 @@
 import { z } from "zod";
-import { churchMember } from "@/db/schema/people";
 
-const churchMemberSchema = z.object({
+const nullableString = z
+  .string()
+  .trim()
+  .nullable()
+  .transform((value) => (value === "" || value === undefined ? null : value));
+
+const nullableDate = z
+  .date()
+  .nullable()
+  .transform((value) => (value === null || value === undefined ? null : value));
+
+const churchMemberFormSchema = z.object({
   id: z.uuid(),
-  organizationId: z.uuid(),
-  userId: z.uuid().optional(),
-  churchPositionId: z.uuid().optional(),
+  userId: z.string().uuid().optional(),
+  churchPositionId: z.string().uuid().optional(),
+  churchFunctionId: z.string().uuid().optional(),
 
-  type: z.enum(["MEMBER", "VISITOR"]).default("MEMBER"),
+  type: z.enum(["MEMBER", "VISITOR"]),
+
+  photoUrl: nullableString,
   name: z.string().min(1, "Campo obrigatório"),
-  birthDate: z.date().optional(),
-  gender: z.enum(["MALE", "FEMALE"]).optional(),
-  cpf: z.string().optional(),
-  profession: z.string().optional(),
+  birthDate: nullableDate,
+  gender: z.enum(["MALE", "FEMALE"]),
+  cpf: nullableString,
 
-  email: z.email("Endereço de email inválido").optional(),
-  phone: z.string().optional(),
+  email: z.string().email("Endereço de email inválido").optional(),
+  phone: nullableString,
 
-  zipCode: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  neighborhood: z.string().optional(),
-  complement: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
+  zipCode: nullableString,
+  street: nullableString,
+  number: nullableString,
+  neighborhood: nullableString,
+  complement: nullableString,
+  city: nullableString,
+  state: nullableString,
 
-  maritalStatus: z
-    .enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"])
-    .optional(),
-  status: z.enum(["ACTIVE", "INACTIVE"]).default("ACTIVE"),
+  status: z.enum(["ACTIVE", "INACTIVE"]),
 });
 
-export const insertChurchMemberSchema = churchMemberSchema.omit({
+export const createChurchMemberSchema = churchMemberFormSchema.omit({
   id: true,
-  organizationId: true,
 });
-
-export const updateChurchMemberSchema = churchMemberSchema.partial().omit({
-  organizationId: true,
-});
-
-export const deleteChurchMemberSchema = churchMemberSchema.pick({
+export const updateChurchMemberSchema = churchMemberFormSchema;
+export const deleteChurchMemberSchema = churchMemberFormSchema.pick({
   id: true,
 });
 
-export type insertChurchMemberSchema = z.infer<typeof churchMemberSchema>;
-export type updateChurchMemberSchema = z.infer<typeof churchMemberSchema>;
-export type deleteChurchMemberSchema = z.infer<typeof churchMemberSchema>;
-
-export type ChurchMemberSchema = typeof churchMember.$inferSelect;
+export type ChurchMemberFormSchema = z.infer<typeof churchMemberFormSchema>;
+export type CreateChurchMemberSchema = z.infer<typeof createChurchMemberSchema>;
+export type UpdateChurchMemberSchema = z.infer<typeof updateChurchMemberSchema>;
+export type DeleteChurchMemberSchema = z.infer<typeof deleteChurchMemberSchema>;

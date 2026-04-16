@@ -1,0 +1,93 @@
+"use client";
+
+import { ColumnDef } from "@tanstack/react-table";
+import { ChurchMemberFormSchema } from "@/lib/validations/church-member";
+import { ChurchMemberActionCell } from "./church-member-action-cell";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { format } from "date-fns";
+
+export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Seleciona tudo"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Seleciona linha"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nome" />
+    ),
+  },
+  {
+    accessorKey: "type",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tipo" />
+    ),
+    cell: ({ row }) => {
+      const type = row.original.type;
+      return type === "MEMBER" ? "Membro" : "Visitante";
+    },
+  },
+  {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Telefone" />
+    ),
+  },
+  {
+    accessorKey: "neighborhood",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Bairro" />
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const status = row.original.status;
+      return status === "ACTIVE" ? "Ativo" : "Inativo";
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Criado em" />
+    ),
+    cell: ({ row }) => format(row.getValue("createdAt"), "dd/MM/yyyy HH:mm:ss"),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const churchMember = row.original;
+      return (
+        <ChurchMemberActionCell id={churchMember.id} path="/people/members" />
+      );
+    },
+  },
+];
