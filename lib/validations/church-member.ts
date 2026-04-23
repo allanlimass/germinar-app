@@ -6,28 +6,39 @@ const nullableString = z
   .nullable()
   .transform((value) => (value === "" || value === undefined ? null : value));
 
-const nullableDate = z
-  .date()
-  .nullable()
-  .transform((value) => (value === null || value === undefined ? null : value));
-
 const churchMemberFormSchema = z.object({
   id: z.uuid(),
-  userId: z.string().uuid().optional(),
-  churchPositionId: z.string().uuid().optional(),
-  churchFunctionId: z.string().uuid().optional(),
+  userId: z.string().uuid().nullable(),
+  churchPositionId: z.string().uuid().nullable().optional(),
+  churchFunctionId: z.string().uuid().nullable().optional(),
 
   type: z.enum(["MEMBER", "VISITOR"]),
 
   photoUrl: nullableString,
   name: z.string().min(1, "Campo obrigatório"),
-  birthDate: nullableDate,
+  birthDate: z.date().optional().nullable(),
   gender: z.enum(["MALE", "FEMALE"]),
-  cpf: nullableString,
+  cpf: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .transform((value) => {
+      if (!value) return null;
+      return value.replace(/\D/g, "");
+    })
+    .refine((value) => value?.length === 11, { message: "CPF inválido" }),
 
   email: z.string().email("Endereço de email inválido").optional(),
-  phone: nullableString,
-
+  phone: z
+    .string()
+    .trim()
+    .nullable()
+    .transform((value) => {
+      if (!value) return null;
+      return value.replace(/\D/g, "");
+    })
+    .refine((value) => value?.length === 11, { message: "Telefone inválido" }),
   zipCode: nullableString,
   street: nullableString,
   number: nullableString,

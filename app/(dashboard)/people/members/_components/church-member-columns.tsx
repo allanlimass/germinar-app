@@ -35,6 +35,10 @@ export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nome" />
     ),
+    cell: ({ row }) => {
+      const name = row.original.name;
+      return <span className="font-medium">{name}</span>;
+    },
   },
   {
     accessorKey: "type",

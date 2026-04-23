@@ -70,7 +70,7 @@ export const churchMember = pgTable(
 
     photoUrl: text("photo_url"),
     name: text("name").notNull(),
-    birthDate: date("birth_date"),
+    birthDate: date("birth_date", { mode: "date" }),
     gender: genderEnum("gender"),
     cpf: text("cpf").unique(),
 
