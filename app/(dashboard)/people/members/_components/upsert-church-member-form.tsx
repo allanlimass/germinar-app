@@ -717,42 +717,43 @@ export function UpsertChurchMemberForm({
           </TabsContent>
         </Tabs>
 
-        <div className="flex items-center justify-end gap-4 border-t pt-4">
-          <Button type="button" variant="ghost" onClick={() => router.back()}>
-            <ArrowLeftIcon className="mr-2 size-4" />
-            Voltar
-          </Button>
+        <div className="flex items-center justify-between gap-4 border-t pt-6">
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" onClick={() => router.back()}>
+              Cancelar
+            </Button>
+          </div>
 
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={form.formState.isSubmitting}
-            onClick={() => (submitTypeRef.current = "continue")}
-          >
-            <SaveIcon className="mr-2 size-4" />
-            {form.formState.isSubmitting ? (
-              <Loader2Icon className="size-4 animate-spin" />
-            ) : isEditing ? (
-              "Salvar & Continuar"
-            ) : (
-              "Adicionar & Continuar"
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={form.formState.isSubmitting}
+              onClick={() => (submitTypeRef.current = "continue")}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : isEditing ? (
+                "Salvar & Continuar"
+              ) : (
+                "Adicionar & Continuar"
+              )}
+            </Button>
 
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            onClick={() => (submitTypeRef.current = "default")}
-          >
-            <SaveIcon className="mr-2 size-4" />
-            {form.formState.isSubmitting ? (
-              <Loader2Icon className="size-4 animate-spin" />
-            ) : isEditing ? (
-              "Salvar"
-            ) : (
-              "Adicionar"
-            )}
-          </Button>
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              onClick={() => (submitTypeRef.current = "default")}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : isEditing ? (
+                "Salvar"
+              ) : (
+                "Adicionar"
+              )}
+            </Button>
+          </div>
         </div>
       </form>
     </>

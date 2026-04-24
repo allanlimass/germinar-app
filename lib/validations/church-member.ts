@@ -27,18 +27,31 @@ const churchMemberFormSchema = z.object({
       if (!value) return null;
       return value.replace(/\D/g, "");
     })
-    .refine((value) => value?.length === 11, { message: "CPF inválido" }),
+    .refine((value) => !value || value.length === 11, {
+      message: "CPF inválido",
+    }),
 
-  email: z.string().email("Endereço de email inválido").optional(),
+  email: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .transform((value) => (value === "" || !value ? null : value))
+    .refine((value) => !value || z.string().email().safeParse(value).success, {
+      message: "Email inválido",
+    }),
   phone: z
     .string()
     .trim()
     .nullable()
+    .optional()
     .transform((value) => {
       if (!value) return null;
       return value.replace(/\D/g, "");
     })
-    .refine((value) => value?.length === 11, { message: "Telefone inválido" }),
+    .refine((value) => !value || value.length === 11, {
+      message: "Telefone inválido",
+    }),
   zipCode: nullableString,
   street: nullableString,
   number: nullableString,
@@ -59,10 +72,14 @@ export const deleteChurchMemberSchema = churchMemberFormSchema.pick({
 });
 
 export type CreateChurchMemberInput = z.input<typeof createChurchMemberSchema>;
-export type CreateChurchMemberOutput = z.output<typeof createChurchMemberSchema>;
+export type CreateChurchMemberOutput = z.output<
+  typeof createChurchMemberSchema
+>;
 
 export type UpdateChurchMemberInput = z.input<typeof updateChurchMemberSchema>;
-export type UpdateChurchMemberOutput = z.output<typeof updateChurchMemberSchema>;
+export type UpdateChurchMemberOutput = z.output<
+  typeof updateChurchMemberSchema
+>;
 
 export type ChurchMemberFormSchema = z.output<typeof churchMemberFormSchema>;
 export type DeleteChurchMemberSchema = z.infer<typeof deleteChurchMemberSchema>;
