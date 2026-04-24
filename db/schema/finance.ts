@@ -44,6 +44,11 @@ export const financeAccount = pgTable(
   ],
 );
 
+export const financeChartOfAccountsType = pgEnum(
+  "finance_chart_of_accounts_type",
+  ["EXPENSE", "INCOME"],
+);
+
 export const financeChartOfAccounts = pgTable(
   "finance_chart_of_accounts",
   {
@@ -53,7 +58,7 @@ export const financeChartOfAccounts = pgTable(
       .references(() => organization.id),
     parentId: uuid("parent_id"),
     name: text("name").notNull(),
-    type: text("type").notNull(),
+    type: financeChartOfAccountsType("type").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
