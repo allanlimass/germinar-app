@@ -5,8 +5,12 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   ChurchMemberFormSchema,
-  CreateChurchMemberSchema,
+  CreateChurchMemberInput,
+  CreateChurchMemberOutput,
+  UpdateChurchMemberInput,
+  UpdateChurchMemberOutput,
   createChurchMemberSchema,
+  updateChurchMemberSchema,
 } from "@/lib/validations/church-member";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon, User } from "lucide-react";
@@ -76,9 +80,16 @@ export function UpsertChurchMemberForm({
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
-  const form = useForm<CreateChurchMemberSchema>({
-    resolver: zodResolver(createChurchMemberSchema),
+  const form = useForm<
+    CreateChurchMemberInput | UpdateChurchMemberInput,
+    unknown,
+    CreateChurchMemberOutput | UpdateChurchMemberOutput
+  >({
+    resolver: zodResolver(
+      isEditing ? updateChurchMemberSchema : createChurchMemberSchema,
+    ),
     defaultValues: {
+      ...(isEditing && initialData ? { id: initialData.id } : {}),
       userId: initialData?.userId ?? null,
       churchPositionId: initialData?.churchPositionId ?? null,
       churchFunctionId: initialData?.churchFunctionId ?? null,
@@ -128,7 +139,9 @@ export function UpsertChurchMemberForm({
     },
   });
 
-  const onSubmit = (data: CreateChurchMemberSchema) => {
+  const onSubmit = (
+    data: CreateChurchMemberOutput | UpdateChurchMemberOutput,
+  ) => {
     if (isEditing && initialData) {
       updateChurchMemberAction.execute({ ...data, id: initialData.id });
     } else {

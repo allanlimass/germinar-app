@@ -58,7 +58,11 @@ export const deleteChurchMemberSchema = churchMemberFormSchema.pick({
   id: true,
 });
 
-export type ChurchMemberFormSchema = z.infer<typeof churchMemberFormSchema>;
-export type CreateChurchMemberSchema = z.infer<typeof createChurchMemberSchema>;
-export type UpdateChurchMemberSchema = z.infer<typeof updateChurchMemberSchema>;
+export type CreateChurchMemberInput = z.input<typeof createChurchMemberSchema>;
+export type CreateChurchMemberOutput = z.output<typeof createChurchMemberSchema>;
+
+export type UpdateChurchMemberInput = z.input<typeof updateChurchMemberSchema>;
+export type UpdateChurchMemberOutput = z.output<typeof updateChurchMemberSchema>;
+
+export type ChurchMemberFormSchema = z.output<typeof churchMemberFormSchema>;
 export type DeleteChurchMemberSchema = z.infer<typeof deleteChurchMemberSchema>;
