@@ -80,6 +80,7 @@ export const financeCostCenter = pgTable(
       .notNull()
       .references(() => organization.id),
     name: text("name").notNull(),
+    description: text("description"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
