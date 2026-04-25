@@ -34,23 +34,20 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  ColumnsIcon,
-  Download,
-  Plus,
-  SearchIcon,
+  Columns3,
+  Filter,
+  Search,
 } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { useRouter, usePathname } from "next/navigation";
 import { Separator } from "./ui/separator";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  actionButtonLabel?: string;
   searchableColumn?: string;
 }
 
@@ -58,19 +55,11 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchableColumn,
-  actionButtonLabel,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleNew = () => {
-    router.push(`${pathname}/new`);
-  };
 
   const table = useReactTable({
     data,
@@ -94,67 +83,64 @@ export function DataTable<TData, TValue>({
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="flex shrink-0 justify-between gap-2">
-        <div className="flex w-full gap-2">
-          <InputGroup className="max-w-sm">
-            <InputGroupInput
-              placeholder="Pesquisar"
-              value={
-                (table
-                  .getColumn(searchableColumn!)
-                  ?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table
-                  .getColumn(searchableColumn!)
-                  ?.setFilterValue(event.target.value)
-              }
-            />
-            <InputGroupAddon>
-              <SearchIcon className="h-4 w-4" />
-            </InputGroupAddon>
-          </InputGroup>
+        <div className="flex w-full flex-col justify-between gap-2 sm:flex-row">
+          <div className="flex w-1/3">
+            <InputGroup className="">
+              <InputGroupInput
+                placeholder="Pesquisar"
+                value={
+                  (table
+                    .getColumn(searchableColumn!)
+                    ?.getFilterValue() as string) ?? ""
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn(searchableColumn!)
+                    ?.setFilterValue(event.target.value)
+                }
+              />
+              <InputGroupAddon>
+                <Search className="h-4 w-4" />
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <ColumnsIcon className="h-4 w-4" />
-                Colunas
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Colunas</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Columns3 className="h-4 w-4" />
+                  Colunas
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Colunas</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4" />
-            Exportar
-          </Button>
-
-          <Button onClick={handleNew}>
-            <Plus className="h-4 w-4" />
-            Adicionar {actionButtonLabel}
-          </Button>
+            <Button variant="outline">
+              <Filter className="h-4 w-4" />
+              Filtros
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -166,7 +152,10 @@ export function DataTable<TData, TValue>({
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead
+                        className="bg-muted/50 text-muted-foreground"
+                        key={header.id}
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(

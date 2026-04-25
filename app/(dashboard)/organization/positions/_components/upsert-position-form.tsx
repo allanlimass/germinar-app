@@ -24,7 +24,7 @@ import {
   createChurchPosition,
   updateChurchPosition,
 } from "@/actions/position-actions";
-import { DashboardHeader } from "@/components/layout/header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 
 interface UpsertChurchPositionFormProps {
   initialData?: ChurchPositionFormSchema;

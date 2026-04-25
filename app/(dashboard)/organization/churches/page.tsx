@@ -2,7 +2,8 @@ import { DataTable } from "@/components/data-table";
 import { columns } from "./_components/columns";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { DashboardHeader } from "@/components/layout/header";
+import PageLayout from "@/components/layout/page-layout";
+import { PageLayoutActions } from "@/components/layout/page-layout-actions";
 
 export default async function ChurchesPage() {
   const churches = await auth.api.listOrganizations({
@@ -14,17 +15,14 @@ export default async function ChurchesPage() {
   }
 
   return (
-    <>
-      <DashboardHeader
-        heading="Igrejas"
-        text="Gerencie as igrejas da sua organização"
-      />
-      <DataTable
-        columns={columns}
-        data={churches}
-        searchableColumn="name"
-        actionButtonLabel="Igreja"
-      />
-    </>
+    <div>
+      <PageLayout
+        title="Igrejas"
+        description="Gerencie as igrejas da sua organização"
+        actions={<PageLayoutActions addButtonLabel="Nova Igreja" />}
+      >
+        <DataTable data={churches} columns={columns} />
+      </PageLayout>
+    </div>
   );
 }

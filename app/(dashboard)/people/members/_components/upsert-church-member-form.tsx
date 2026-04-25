@@ -23,7 +23,7 @@ import {
   createChurchMember,
   updateChurchMember,
 } from "@/actions/church-member-actions";
-import { DashboardHeader } from "@/components/layout/header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,

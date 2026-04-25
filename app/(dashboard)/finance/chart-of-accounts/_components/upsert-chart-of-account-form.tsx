@@ -24,7 +24,7 @@ import {
   updateChartOfAccount,
 } from "@/actions/chart-of-account-actions";
 import React from "react";
-import { DashboardHeader } from "@/components/layout/header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import {
   Select,
   SelectContent,

@@ -41,7 +41,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import React from "react";
-import { DashboardHeader } from "@/components/layout/header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 
 interface ChurchOption {
   id: string;

@@ -24,7 +24,7 @@ import {
   updateChurchFunction,
 } from "@/actions/function-actions";
 import React from "react";
-import { DashboardHeader } from "@/components/layout/header";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 
 interface UpsertChurchFunctionFormProps {
   initialData?: ChurchFunctionFormSchema;

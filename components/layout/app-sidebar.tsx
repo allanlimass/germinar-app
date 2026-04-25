@@ -115,7 +115,10 @@ export function AppSidebar({
         </SidebarFooter>
       </Sidebar>
 
-      <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+      <Sidebar
+        collapsible="none"
+        className="bg-background hidden flex-1 md:flex"
+      >
         <SidebarHeader className="gap-3.5 p-4">
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium">
@@ -124,7 +127,7 @@ export function AppSidebar({
             <SidebarTrigger className="-ml-1" />
           </div>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="px-2">
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>

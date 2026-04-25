@@ -1,23 +1,21 @@
 import { DataTable } from "@/components/data-table";
 import { columns } from "./_components/columns";
 import { listUsers } from "@/db/queries/users";
-import { DashboardHeader } from "@/components/layout/header";
+import PageLayout from "@/components/layout/page-layout";
+import { PageLayoutActions } from "@/components/layout/page-layout-actions";
 
 export default async function UsersPage() {
   const users = await listUsers();
 
   return (
-    <>
-      <DashboardHeader
-        heading="Usuários"
-        text="Gerencie os usuários da sua organização"
-      />
-      <DataTable
-        columns={columns}
-        data={users}
-        searchableColumn="email"
-        actionButtonLabel="Usuário"
-      />
-    </>
+    <div>
+      <PageLayout
+        title="Usuários"
+        description="Gerencie os usuários da sua organização"
+        actions={<PageLayoutActions addButtonLabel="Novo Usuário" />}
+      >
+        <DataTable data={users} columns={columns} />
+      </PageLayout>
+    </div>
   );
 }
