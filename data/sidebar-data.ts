@@ -12,6 +12,7 @@ import {
   FileText,
   Award,
   HandHeart,
+  Briefcase,
 } from "lucide-react";
 
 export const data = {
@@ -19,7 +20,7 @@ export const data = {
     {
       title: "Organização",
       url: "#",
-      icon: Church,
+      icon: Briefcase,
       isActive: false,
       items: [
         {
@@ -55,6 +56,32 @@ export const data = {
         {
           title: "Relatórios",
           url: "/organization/reports",
+          icon: FileText,
+          isActive: false,
+        },
+      ],
+    },
+    {
+      title: "Administração",
+      url: "#",
+      icon: Church,
+      isActive: false,
+      items: [
+        {
+          title: "Dashboard",
+          url: "/administration",
+          icon: Gauge,
+          isActive: false,
+        },
+        {
+          title: "Usuários",
+          url: "/administration/users",
+          icon: Users,
+          isActive: false,
+        },
+        {
+          title: "Relatórios",
+          url: "/administration/reports",
           icon: FileText,
           isActive: false,
         },
