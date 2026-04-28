@@ -97,25 +97,8 @@ export const organization = pgTable(
     logo: text("logo"),
     createdAt: timestamp("created_at").notNull(),
     metadata: text("metadata"),
-    type: organizationType("type").notNull(),
-    path: text("path"),
-    cnpj: text("cnpj"),
-    email: text("email"),
-    phone: text("phone"),
-    street: text("street"),
-    number: text("number"),
-    complement: text("complement"),
-    neighborhood: text("neighborhood"),
-    city: text("city"),
-    state: text("state"),
-    zipCode: text("zip_code"),
   },
-  (table) => [
-    uniqueIndex("organization_slug_uidx").on(table.slug),
-    index("organization_cnpj_uidx").on(table.cnpj),
-    index("organization_city_uidx").on(table.city),
-    index("organization_state_uidx").on(table.state),
-  ],
+  (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
 );
 
 export const member = pgTable(

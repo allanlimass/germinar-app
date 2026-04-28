@@ -1,6 +1,6 @@
 import { getSessionContext } from "@/lib/utils/db-utils";
 import { UpsertChurchForm } from "../_components/upsert-church-form";
-import { listChurchById, listChurchesByType } from "@/db/queries/churches";
+import { listChurchById, listChurchesByType } from "@/db/queries/branches";
 
 export default async function EditChurchPage({
   params,

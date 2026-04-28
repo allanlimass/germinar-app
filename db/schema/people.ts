@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { relations } from "drizzle-orm";
+import { branch } from "./organization";
 
 export const churchPosition = pgTable(
   "church_position",
@@ -17,12 +18,16 @@ export const churchPosition = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("churchPosition_organizationId_idx").on(table.organizationId),
+    index("churchPosition_branchId_idx").on(table.branchId),
   ],
 );
 
@@ -33,18 +38,22 @@ export const churchFunction = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("churchFunction_organizationId_idx").on(table.organizationId),
+    index("churchFunction_branchId_idx").on(table.branchId),
   ],
 );
 
-export const memberTypeEnum = pgEnum("member_type", ["MEMBER", "VISITOR"]);
-export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
-export const memberStatusEnum = pgEnum("member_status", ["ACTIVE", "INACTIVE"]);
+export const memberTypeEnum = pgEnum("member_type", ["member", "visitor"]);
+export const genderEnum = pgEnum("gender", ["male", "female"]);
+export const memberStatusEnum = pgEnum("member_status", ["active", "inactive"]);
 
 export const churchMember = pgTable(
   "church_member",
@@ -53,6 +62,9 @@ export const churchMember = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id, { onDelete: "cascade" }),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     churchPositionId: uuid("church_position_id").references(
       () => churchPosition.id,
@@ -66,7 +78,7 @@ export const churchMember = pgTable(
         onDelete: "set null",
       },
     ),
-    type: memberTypeEnum("type").default("MEMBER").notNull(),
+    type: memberTypeEnum("type").default("member").notNull(),
 
     photoUrl: text("photo_url"),
     name: text("name").notNull(),
@@ -85,7 +97,7 @@ export const churchMember = pgTable(
     city: text("city"),
     state: text("state"),
 
-    status: memberStatusEnum("status").default("ACTIVE").notNull(),
+    status: memberStatusEnum("status").default("active").notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -95,6 +107,7 @@ export const churchMember = pgTable(
   },
   (table) => [
     index("churchMember_organizationId_idx").on(table.organizationId),
+    index("churchMember_branchId_idx").on(table.branchId),
     index("churchMember_userId_idx").on(table.userId),
     index("churchMember_churchPositionId_idx").on(table.churchPositionId),
     index("churchMember_churchFunctionId_idx").on(table.churchFunctionId),
@@ -108,6 +121,10 @@ export const churchPositionRelations = relations(
       fields: [churchPosition.organizationId],
       references: [organization.id],
     }),
+    branch: one(branch, {
+      fields: [churchPosition.branchId],
+      references: [branch.id],
+    }),
     members: many(churchMember),
   }),
 );
@@ -119,6 +136,10 @@ export const churchFunctionRelations = relations(
       fields: [churchFunction.organizationId],
       references: [organization.id],
     }),
+    branch: one(branch, {
+      fields: [churchFunction.branchId],
+      references: [branch.id],
+    }),
     members: many(churchMember),
   }),
 );
@@ -127,6 +148,10 @@ export const churchMemberRelations = relations(churchMember, ({ one }) => ({
   organization: one(organization, {
     fields: [churchMember.organizationId],
     references: [organization.id],
+  }),
+  branch: one(branch, {
+    fields: [churchMember.branchId],
+    references: [branch.id],
   }),
   user: one(user, {
     fields: [churchMember.userId],

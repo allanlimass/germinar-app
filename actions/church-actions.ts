@@ -6,93 +6,80 @@ import {
   updateChurchSchema,
   deleteChurchSchema,
 } from "@/lib/validations/church";
-import { slugify } from "@/lib/utils/services";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import z from "zod";
-import { getSessionContext } from "@/lib/utils/db-utils";
+import { db } from "@/db";
+import { branch } from "@/db/schema/organization";
+import { eq } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 export const createChurchAction = actionClient
   .inputSchema(createChurchSchema)
-  .action(async ({ parsedInput }) => {
-    const { organizationId: previousOrgId } = await getSessionContext();
+  .action(async ({ parsedInput, ctx }) => {
+    const { organizationId } = ctx;
 
-    const slug = slugify(parsedInput.name);
-    const organization = await auth.api.createOrganization({
-      body: {
+    const newId = randomUUID();
+
+    const parentId =
+      parsedInput.type === "headquarters" ? null : parsedInput.parentId;
+
+    const path = parentId ? `${parentId}.${newId}` : newId;
+
+    const [newChurch] = await db
+      .insert(branch)
+      .values({
         ...parsedInput,
-        slug,
-      },
-      headers: await headers(),
-    });
+        id: newId,
+        parentId,
+        path,
+        organizationId,
+      })
+      .returning({
+        id: branch.id,
+      });
 
-    const path = parsedInput.parentId
-      ? parsedInput.parentId + "." + organization.id
-      : organization.id;
-
-    await auth.api.updateOrganization({
-      body: {
-        organizationId: organization.id,
-        data: {
-          slug,
-          path,
-        },
-      },
-      headers: await headers(),
-    });
-
-    await auth.api.setActiveOrganization({
-      body: {
-        organizationId: previousOrgId,
-      },
-      headers: await headers(),
-    });
-
-    return { success: true, id: organization.id };
+    return newChurch;
   });
 
 export const updateChurchAction = actionClient
   .inputSchema(updateChurchSchema)
-  .action(async ({ parsedInput }) => {
-    const { id, path, ...data } = parsedInput;
-    const slug = slugify(data.name);
-    await auth.api.updateOrganization({
-      body: {
-        organizationId: id,
-        data: {
-          ...data,
-          slug,
-          path,
-        },
-      },
-      headers: await headers(),
-    });
+  .action(async ({ parsedInput, ctx }) => {
+    const { id, ...updateData } = parsedInput;
 
-    return { success: true };
+    if (!id) {
+      throw new Error("ID da filial é obrigatório para atualização.");
+    }
+
+    // Matriz não pode ter parentId
+    const parentId =
+      updateData.type === "headquarters" ? null : updateData.parentId;
+
+    const path = parentId ? `${parentId}.${id}` : id;
+
+    const [updatedChurch] = await db
+      .update(branch)
+      .set({
+        ...updateData,
+        parentId,
+        path,
+      })
+      .where(eq(branch.id, id))
+      .returning({ id: branch.id });
+
+    return updatedChurch;
   });
 
 export const deleteChurchAction = actionClient
   .inputSchema(deleteChurchSchema)
-  .action(async ({ parsedInput }) => {
-    await auth.api.deleteOrganization({
-      body: {
-        organizationId: parsedInput.id,
-      },
-      headers: await headers(),
-    });
+  .action(async ({ parsedInput, ctx }) => {
+    const { id } = parsedInput;
 
-    return { success: true };
-  });
+    if (!id) {
+      throw new Error("ID da filial é obrigatório para exclusão.");
+    }
 
-export const setActiveChurchAction = actionClient
-  .inputSchema(z.object({ organizationId: z.string() }))
-  .action(async ({ parsedInput }) => {
-    await auth.api.setActiveOrganization({
-      body: {
-        organizationId: parsedInput.organizationId,
-      },
-      headers: await headers(),
-    });
+    const deletedChurch = await db
+      .delete(branch)
+      .where(eq(branch.id, id))
+      .returning({ id: branch.id });
 
-    return { success: true };
+    return deletedChurch;
   });

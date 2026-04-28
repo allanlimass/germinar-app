@@ -31,71 +31,7 @@ export const auth = betterAuth({
         ...roles,
       },
       schema: {
-        organization: {
-          additionalFields: {
-            type: {
-              type: "string",
-              values: ["headquarters", "regional", "local"],
-              input: true,
-              required: true,
-            },
-            path: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            cnpj: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            email: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            phone: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            street: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            number: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            complement: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            neighborhood: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            city: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            state: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-            zipCode: {
-              type: "string",
-              input: true,
-              required: false,
-            },
-          },
-        },
+        organization: {},
       },
       async sendInvitationEmail(data) {
         const inviteLink = `${process.env.BETTER_AUTH_URL}/accept-invitation/${data.id}`;

@@ -22,67 +22,40 @@ import { Controller, useForm } from "react-hook-form";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { churchFormSchema, CreateChurchInput } from "@/lib/validations/church";
-import { slugify } from "@/lib/utils/services";
+import {
+  createChurchSchema,
+  CreateChurchInput,
+} from "@/lib/validations/church";
+import { createOrganization } from "@/actions/organization-actions";
+import { useAction } from "next-safe-action/hooks";
 
 export default function OrganizationForm() {
   const router = useRouter();
 
   const form = useForm<CreateChurchInput>({
-    resolver: zodResolver(churchFormSchema),
+    resolver: zodResolver(createChurchSchema),
     defaultValues: {
-      type: "headquarters",
       name: "",
     },
   });
-
-  const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    form.setValue("name", value, {
-      shouldValidate: true,
-    });
-  };
 
   const handleLogout = async () => {
     await authClient.signOut();
     router.push("/login");
   };
 
-  const onSubmit = async (data: CreateChurchInput) => {
-    await authClient.organization.create(
-      {
-        type: "headquarters",
-        name: data.name,
-        slug: slugify(data.name),
-      },
-      {
-        onSuccess: async (ctx) => {
-          const organizationId = ctx.data?.id;
+  const createOrganizationAction = useAction(createOrganization, {
+    onSuccess: () => {
+      toast.success("Organização criada com sucesso!");
+      router.push("/organization");
+    },
+    onError: (ctx) => {
+      console.error(ctx.error.serverError);
+    },
+  });
 
-          if (!organizationId) {
-            toast.error("Erro ao criar organização");
-            return;
-          }
-
-          await authClient.organization.update({
-            organizationId,
-            data: {
-              path: organizationId,
-            },
-          });
-
-          await authClient.organization.setActive({
-            organizationId,
-          });
-          toast.success("Organização criada com sucesso!");
-          router.push("/organization/churches");
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-          console.error(ctx.error);
-        },
-      },
-    );
+  const onSubmit = (data: CreateChurchInput) => {
+    createOrganizationAction.execute(data);
   };
 
   return (
@@ -100,12 +73,13 @@ export default function OrganizationForm() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>Nome da Matriz</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Nome da Organização
+                    </FieldLabel>
                     <Input
                       id={field.name}
                       {...field}
-                      onChange={onChangeName}
-                      placeholder="Digite o nome da matriz"
+                      placeholder="Digite o nome da organização"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

@@ -4,10 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { organization } from "@/db/schema/auth";
+import { Church } from "@/lib/validations/church";
 import { ChurchActionCell } from "./church-action-cell";
-
-export type Church = typeof organization.$inferSelect;
 
 export const columns: ColumnDef<Church>[] = [
   {
@@ -53,12 +51,6 @@ export const columns: ColumnDef<Church>[] = [
     },
   },
   {
-    accessorKey: "cnpj",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="CNPJ" />
-    ),
-  },
-  {
     accessorKey: "neighborhood",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Bairro" />
@@ -73,7 +65,7 @@ export const columns: ColumnDef<Church>[] = [
   {
     accessorKey: "state",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="UF" />
+      <DataTableColumnHeader column={column} title="Estado" />
     ),
   },
   {

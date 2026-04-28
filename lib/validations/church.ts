@@ -1,90 +1,73 @@
 import { z } from "zod";
+import { branch } from "@/db/schema/organization";
 
-const formOptionalString = z
-  .literal("")
-  .transform(() => null)
-  .or(z.string().nullable().optional());
+export type Church = typeof branch.$inferSelect;
 
-const formOptionalEmail = z
-  .literal("")
-  .transform(() => null)
-  .or(z.string().email().nullable().optional());
-
-const dbOptionalString = z
-  .string()
-  .nullish()
-  .transform((val) => val ?? null);
-const dbOptionalEmail = z
-  .email()
-  .nullish()
-  .transform((val) => val ?? null);
-
-export const churchFormSchema = z.object({
-  name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  logo: formOptionalString,
-
-  type: z.enum(
-    ["headquarters", "regional", "local"],
-    "Selecione o tipo da unidade",
-  ),
-
-  cnpj: formOptionalString,
-  email: formOptionalEmail,
-  phone: formOptionalString,
-
-  street: formOptionalString,
-  number: formOptionalString,
-  complement: formOptionalString,
-  neighborhood: formOptionalString,
-  city: formOptionalString,
-  state: z
-    .literal("")
-    .transform(() => null)
-    .or(
-      z.string().max(2, "Use a sigla do estado (Ex: SP)").nullable().optional(),
-    ),
-  zipCode: formOptionalString,
-});
-
-export const churchDbSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  slug: z.string(),
-  logo: dbOptionalString,
-
+const churchBase = z.object({
+  parentId: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
   type: z.enum(["headquarters", "regional", "local"]),
 
-  cnpj: dbOptionalString,
-  email: dbOptionalEmail,
-  phone: dbOptionalString,
+  logoUrl: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  name: z.string().min(1, "Campo obrigatório."),
+  cnpj: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  phone: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  email: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
 
-  street: dbOptionalString,
-  number: dbOptionalString,
-  complement: dbOptionalString,
-  neighborhood: dbOptionalString,
-  city: dbOptionalString,
-  state: dbOptionalString,
-  zipCode: dbOptionalString,
-
-  path: dbOptionalString,
-  metadata: dbOptionalString,
+  zipCode: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  street: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  number: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  complement: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  neighborhood: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  city: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
+  state: z
+    .string()
+    .nullish()
+    .transform((v) => (v === "" ? null : v)),
 });
 
-export const createChurchSchema = churchFormSchema.extend({
-  parentId: formOptionalString,
-  path: formOptionalString,
-});
+export const createChurchSchema = churchBase;
 
-export const updateChurchSchema = churchFormSchema.extend({
-  id: z.string(),
-  path: formOptionalString,
+export const updateChurchSchema = churchBase.extend({
+  id: z.uuid(),
 });
 
 export const deleteChurchSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
 });
 
-export type ChurchDbSchema = z.infer<typeof churchDbSchema>;
-export type CreateChurchInput = z.infer<typeof createChurchSchema>;
+export type CreateChurchInput = z.input<typeof createChurchSchema>;
 export type UpdateChurchInput = z.infer<typeof updateChurchSchema>;
 export type DeleteChurchInput = z.infer<typeof deleteChurchSchema>;

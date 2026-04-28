@@ -28,11 +28,9 @@ import {
   formatZipCode,
 } from "@/lib/utils/services";
 import {
-  CreateChurchInput,
-  UpdateChurchInput,
-  ChurchDbSchema,
+  Church,
   createChurchSchema,
-  updateChurchSchema,
+  CreateChurchInput,
 } from "@/lib/validations/church";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
@@ -50,7 +48,7 @@ interface ChurchOption {
 }
 
 interface UpsertChurchFormProps {
-  initialData?: ChurchDbSchema;
+  initialData?: Church;
   headquarters?: ChurchOption[];
   regionals?: ChurchOption[];
 }
@@ -67,26 +65,22 @@ export function UpsertChurchForm({
 
   const parentId = initialData?.path?.split(".").slice(0, -1).join(".");
 
-  const form = useForm<CreateChurchInput | UpdateChurchInput>({
-    resolver: zodResolver(isEditing ? updateChurchSchema : createChurchSchema),
+  const form = useForm<CreateChurchInput>({
+    resolver: zodResolver(createChurchSchema),
     defaultValues: {
-      id: initialData?.id || "",
-      path: initialData?.path || "",
-      name: initialData?.name || "",
-      logo: initialData?.logo || "",
-      type:
-        (initialData?.type as "headquarters" | "regional" | "local") || "local",
-      cnpj: initialData?.cnpj || "",
-      phone: initialData?.phone || "",
-      email: initialData?.email || "",
-      zipCode: initialData?.zipCode || "",
-      street: initialData?.street || "",
-      number: initialData?.number || "",
-      complement: initialData?.complement || "",
-      neighborhood: initialData?.neighborhood || "",
-      city: initialData?.city || "",
-      state: initialData?.state || "",
-      parentId: parentId || "",
+      parentId: parentId ?? "",
+      name: initialData?.name ?? "",
+      type: initialData?.type ?? "local",
+      cnpj: initialData?.cnpj ?? "",
+      phone: initialData?.phone ?? "",
+      email: initialData?.email ?? "",
+      zipCode: initialData?.zipCode ?? "",
+      street: initialData?.street ?? "",
+      number: initialData?.number ?? "",
+      complement: initialData?.complement ?? "",
+      neighborhood: initialData?.neighborhood ?? "",
+      city: initialData?.city ?? "",
+      state: initialData?.state ?? "",
     },
   });
 
@@ -101,14 +95,13 @@ export function UpsertChurchForm({
       router.push("/organization/churches");
     },
     onError: (ctx) => {
-      console.error(ctx);
       toast.error("Erro ao criar igreja: " + ctx.error.serverError);
     },
   });
 
   const updateChurch = useAction(updateChurchAction, {
     onSuccess: () => {
-      toast.success("Filial atualizada com sucesso!");
+      toast.success("Igreja atualizada com sucesso!");
       if (submitTypeRef.current === "continue") {
         router.refresh();
         return;
@@ -116,13 +109,13 @@ export function UpsertChurchForm({
       router.push("/organization/churches");
     },
     onError: ({ error }) => {
-      toast.error("Erro ao atualizar filial: " + error.serverError);
+      toast.error("Erro ao atualizar igreja: " + error.serverError);
     },
   });
 
   const isPending = createChurch.isPending || updateChurch.isPending;
 
-  const onSubmit = (data: CreateChurchInput | UpdateChurchInput) => {
+  const onSubmit = (data: CreateChurchInput) => {
     if (isEditing && initialData) {
       updateChurch.execute({ ...data, id: initialData.id });
     } else {
@@ -183,21 +176,13 @@ export function UpsertChurchForm({
                     name="parentId"
                     control={form.control}
                     render={({ field, fieldState }) => (
-                      <Field className="col-span-1">
+                      <Field className="col-span-1" key={field.value}>
                         <FieldLabel htmlFor={field.name}>
                           Igreja Vinculada
                         </FieldLabel>
                         <Select
                           value={field.value ?? ""}
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            const selected = headquarters.find(
-                              (h) => h.id === value,
-                            );
-                            if (selected) {
-                              form.setValue("path", selected.path ?? "");
-                            }
-                          }}
+                          onValueChange={(value) => field.onChange(value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a matriz..." />
@@ -224,63 +209,46 @@ export function UpsertChurchForm({
                   <Controller
                     name="parentId"
                     control={form.control}
-                    render={({ field, fieldState }) => {
-                      const allParents = [...headquarters, ...regionals];
-                      return (
-                        <Field className="col-span-1">
-                          <FieldLabel htmlFor={field.name}>
-                            Igreja Vinculada
-                          </FieldLabel>
-                          <Select
-                            value={field.value ?? ""}
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              const selected = allParents.find(
-                                (c) => c.id === value,
-                              );
-                              if (selected) {
-                                form.setValue("path", selected.path ?? "");
-                              }
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a igreja..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {headquarters.length > 0 && (
-                                <SelectGroup>
-                                  <SelectLabel>Matriz</SelectLabel>
-                                  {headquarters.map((church) => (
-                                    <SelectItem
-                                      key={church.id}
-                                      value={church.id}
-                                    >
-                                      {church.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              )}
-                              {regionals.length > 0 && (
-                                <SelectGroup>
-                                  <SelectLabel>Regionais</SelectLabel>
-                                  {regionals.map((church) => (
-                                    <SelectItem
-                                      key={church.id}
-                                      value={church.id}
-                                    >
-                                      {church.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      );
-                    }}
+                    render={({ field, fieldState }) => (
+                      <Field className="col-span-1">
+                        <FieldLabel htmlFor={field.name}>
+                          Igreja Vinculada
+                        </FieldLabel>
+                        <Select
+                          value={field.value ?? ""}
+                          onValueChange={(value) => field.onChange(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a igreja..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {headquarters.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel>Matriz</SelectLabel>
+                                {headquarters.map((church) => (
+                                  <SelectItem key={church.id} value={church.id}>
+                                    {church.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                            {regionals.length > 0 && (
+                              <SelectGroup>
+                                <SelectLabel>Regionais</SelectLabel>
+                                {regionals.map((church) => (
+                                  <SelectItem key={church.id} value={church.id}>
+                                    {church.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
                 )}
 
@@ -293,6 +261,7 @@ export function UpsertChurchForm({
                       <Input
                         id={field.name}
                         {...field}
+                        value={field.value}
                         placeholder="Digite o nome"
                       />
                       {fieldState.invalid && (

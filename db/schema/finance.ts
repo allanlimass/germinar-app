@@ -13,6 +13,7 @@ import {
 import { organization, user } from "./auth";
 import { churchMember } from "./people";
 import { relations } from "drizzle-orm";
+import { branch } from "./organization";
 
 export const bank = pgTable("bank", {
   id: integer("id").primaryKey(),
@@ -27,6 +28,9 @@ export const financeAccount = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
     bankId: integer("bank_id").references(() => bank.id),
     name: text("name").notNull(),
     agency: text("agency"),
@@ -40,6 +44,7 @@ export const financeAccount = pgTable(
   },
   (table) => [
     index("account_organizationId_idx").on(table.organizationId),
+    index("account_branchId_idx").on(table.branchId),
     index("account_bankId_idx").on(table.bankId),
   ],
 );
@@ -56,6 +61,9 @@ export const financeChartOfAccounts = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
     parentId: uuid("parent_id"),
     name: text("name").notNull(),
     type: financeChartOfAccountsType("type").notNull(),
@@ -68,6 +76,7 @@ export const financeChartOfAccounts = pgTable(
   (table) => [
     foreignKey({ columns: [table.parentId], foreignColumns: [table.id] }),
     index("chart_of_accounts_organizationId_idx").on(table.organizationId),
+    index("chart_of_accounts_branchId_idx").on(table.branchId),
     index("chart_of_accounts_parentId_idx").on(table.parentId),
   ],
 );
@@ -79,6 +88,9 @@ export const financeCostCenter = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
     name: text("name").notNull(),
     description: text("description"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -87,7 +99,10 @@ export const financeCostCenter = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("cost_center_organizationId_idx").on(table.organizationId)],
+  (table) => [
+    index("cost_center_organizationId_idx").on(table.organizationId),
+    index("cost_center_branchId_idx").on(table.branchId),
+  ],
 );
 
 export const financeSupplier = pgTable(
@@ -97,6 +112,9 @@ export const financeSupplier = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
     isCompany: boolean("is_company").default(false).notNull(),
     name: text("name").notNull(),
     companyName: text("company_name"),
@@ -118,7 +136,10 @@ export const financeSupplier = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("person_organizationId_idx").on(table.organizationId)],
+  (table) => [
+    index("person_organizationId_idx").on(table.organizationId),
+    index("person_branchId_idx").on(table.branchId),
+  ],
 );
 
 export const financeTransactionType = pgEnum("finance_transaction_type", [
@@ -145,6 +166,9 @@ export const financeTransaction = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
     financeAccountId: uuid("finance_account_id")
       .notNull()
       .references(() => financeAccount.id),
@@ -179,6 +203,7 @@ export const financeTransaction = pgTable(
   },
   (table) => [
     index("transaction_organizationId_idx").on(table.organizationId),
+    index("transaction_branchId_idx").on(table.branchId),
     index("transaction_financeAccountId_idx").on(table.financeAccountId),
     index("transaction_financeChartOfAccountId_idx").on(
       table.financeChartOfAccountId,
@@ -217,6 +242,14 @@ export const financeTransactionAttachment = pgTable(
 export const financeTransactionRelations = relations(
   financeTransaction,
   ({ one, many }) => ({
+    organization: one(organization, {
+      fields: [financeTransaction.organizationId],
+      references: [organization.id],
+    }),
+    branch: one(branch, {
+      fields: [financeTransaction.branchId],
+      references: [branch.id],
+    }),
     financeAccount: one(financeAccount, {
       fields: [financeTransaction.financeAccountId],
       references: [financeAccount.id],
@@ -252,6 +285,10 @@ export const financeAccountRelations = relations(
       fields: [financeAccount.organizationId],
       references: [organization.id],
     }),
+    branch: one(branch, {
+      fields: [financeAccount.branchId],
+      references: [branch.id],
+    }),
     bank: one(bank, {
       fields: [financeAccount.bankId],
       references: [bank.id],
@@ -266,6 +303,10 @@ export const financeChartOfAccountsRelations = relations(
     organization: one(organization, {
       fields: [financeChartOfAccounts.organizationId],
       references: [organization.id],
+    }),
+    branch: one(branch, {
+      fields: [financeChartOfAccounts.branchId],
+      references: [branch.id],
     }),
     parent: one(financeChartOfAccounts, {
       fields: [financeChartOfAccounts.parentId],
@@ -283,6 +324,10 @@ export const financeSupplierRelations = relations(
       fields: [financeSupplier.organizationId],
       references: [organization.id],
     }),
+    branch: one(branch, {
+      fields: [financeSupplier.branchId],
+      references: [branch.id],
+    }),
     transactions: many(financeTransaction),
   }),
 );
@@ -293,6 +338,10 @@ export const financeCostCenterRelations = relations(
     organization: one(organization, {
       fields: [financeCostCenter.organizationId],
       references: [organization.id],
+    }),
+    branch: one(branch, {
+      fields: [financeCostCenter.branchId],
+      references: [branch.id],
     }),
     transactions: many(financeTransaction),
   }),
