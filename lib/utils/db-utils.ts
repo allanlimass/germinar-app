@@ -1,7 +1,10 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
+import { db } from "@/db";
+import { eq, and } from "drizzle-orm";
+import { branchMember as branchMembers } from "@/db/schema/organization";
 
 export const getSessionContext = cache(async () => {
   const session = await auth.api.getSession({
@@ -21,17 +24,33 @@ export const getSessionContext = cache(async () => {
   return { session, organizationId };
 });
 
-export const getOrganizationsContext = cache(async () => {
-  const listChurches = await auth.api.listOrganizations({
-    headers: await headers(),
+export const getBranchContext = cache(async (branchId: string) => {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const organizationId = session.session?.activeOrganizationId;
+
+  if (!organizationId) {
+    redirect("/onboarding");
+  }
+
+  const branchMember = await db.query.branchMember.findFirst({
+    where: and(
+      eq(branchMembers.branchId, branchId),
+      eq(branchMembers.userId, session.user.id),
+    ),
   });
 
-  const churches = listChurches.map((church) => ({
-    id: church.id,
-    name: church.name,
-    type: church.type,
-    logo: church.logo || undefined,
-  }));
+  if (!branchMember) {
+    return notFound();
+  }
 
-  return { churches };
+  return {
+    session,
+    organizationId,
+    branchMemberRole: branchMember.role,
+  };
 });

@@ -24,7 +24,7 @@ import { data } from "@/data/sidebar-data";
 
 export function AppSidebar({
   user,
-  churches,
+  branches,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   user: {
@@ -32,7 +32,7 @@ export function AppSidebar({
     email: string;
     avatar?: string;
   };
-  churches: {
+  branches: {
     id: string;
     name: string;
     logo?: string;
@@ -111,7 +111,7 @@ export function AppSidebar({
               <span>Tema</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <NavUser user={user} churches={churches} />
+          <NavUser user={user} branches={branches} />
         </SidebarFooter>
       </Sidebar>
 

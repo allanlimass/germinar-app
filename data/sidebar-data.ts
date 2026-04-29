@@ -30,8 +30,8 @@ export const data = {
           isActive: false,
         },
         {
-          title: "Igrejas",
-          url: "/organization/churches",
+          title: "Filiais",
+          url: "/organization/branches",
           icon: Church,
           isActive: false,
         },

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { branch } from "@/db/schema/organization";
 
-export type Church = typeof branch.$inferSelect;
+export type Branch = typeof branch.$inferSelect;
 
-const churchBase = z.object({
+const branchBase = z.object({
   parentId: z
     .string()
     .nullish()
@@ -58,16 +58,16 @@ const churchBase = z.object({
     .transform((v) => (v === "" ? null : v)),
 });
 
-export const createChurchSchema = churchBase;
+export const createBranchSchema = branchBase;
 
-export const updateChurchSchema = churchBase.extend({
+export const updateBranchSchema = branchBase.extend({
   id: z.uuid(),
 });
 
-export const deleteChurchSchema = z.object({
+export const deleteBranchSchema = z.object({
   id: z.uuid(),
 });
 
-export type CreateChurchInput = z.input<typeof createChurchSchema>;
-export type UpdateChurchInput = z.infer<typeof updateChurchSchema>;
-export type DeleteChurchInput = z.infer<typeof deleteChurchSchema>;
+export type CreateBranchInput = z.input<typeof createBranchSchema>;
+export type UpdateBranchInput = z.infer<typeof updateBranchSchema>;
+export type DeleteBranchInput = z.infer<typeof deleteBranchSchema>;

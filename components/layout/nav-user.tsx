@@ -24,14 +24,14 @@ import { toast } from "sonner";
 
 export function NavUser({
   user,
-  churches,
+  branches,
 }: {
   user: {
     name: string;
     email: string;
     avatar?: string;
   };
-  churches: {
+  branches: {
     id: string;
     name: string;
     logo?: string;
@@ -113,19 +113,19 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Igrejas</DropdownMenuLabel>
-              {churches?.map((church) => (
+              <DropdownMenuLabel>Filiais</DropdownMenuLabel>
+              {branches?.map((branch) => (
                 <DropdownMenuItem
-                  key={church.id}
-                  onClick={() => handleSetOrganization(church.id)}
+                  key={branch.id}
+                  onClick={() => handleSetOrganization(branch.id)}
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={church.logo} alt={church.name} />
+                    <AvatarImage src={branch.logo} alt={branch.name} />
                     <AvatarFallback className="rounded-lg">
-                      {initials(church.name)}
+                      {initials(branch.name)}
                     </AvatarFallback>
                   </Avatar>
-                  {church.name}
+                  {branch.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>

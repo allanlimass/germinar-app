@@ -1,17 +1,15 @@
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
-import {
-  getOrganizationsContext,
-  getSessionContext,
-} from "@/lib/utils/db-utils";
+import { getSessionContext } from "@/lib/utils/db-utils";
+import { listBranches } from "@/db/queries/branches";
 
 export default async function PrivateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { session } = await getSessionContext();
+  const { session, organizationId } = await getSessionContext();
 
   const user = {
     name: session?.user?.name,
@@ -19,7 +17,7 @@ export default async function PrivateLayout({
     avatar: session?.user?.image || undefined,
   };
 
-  const { churches } = await getOrganizationsContext();
+  const branches = await listBranches(organizationId);
 
   return (
     <SidebarProvider
@@ -29,7 +27,7 @@ export default async function PrivateLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={user} churches={churches} />
+      <AppSidebar user={user} branches={branches} />
       <SidebarInset>
         <div className="flex flex-1 flex-col gap-4 px-6 py-4">{children}</div>
       </SidebarInset>

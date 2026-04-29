@@ -5,15 +5,13 @@ import { auth } from "@/lib/auth";
 import { slugify } from "@/lib/utils/services";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { createChurchSchema } from "@/lib/validations/church";
+import { createOrganizationSchema } from "@/lib/validations/organization";
 
 export const createOrganization = authActionClient
-  .inputSchema(createChurchSchema)
+  .inputSchema(createOrganizationSchema)
   .action(async ({ parsedInput }) => {
     const name = parsedInput.name;
     const slug = slugify(parsedInput.name);
-
-    console.log("Creating organization with name and slug", name, slug);
 
     const organization = await auth.api.createOrganization({
       body: {

@@ -3,7 +3,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema/auth";
 import { organization } from "better-auth/plugins";
-import { ac, roles } from "@/lib/permissions";
 import { resend } from "./resend";
 import { OrganizationInvitationEmail } from "@/components/emails/organization-invitation";
 
@@ -13,9 +12,20 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  user: {
+    additionalFields: {
+      lastActiveBranchId: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
+  organization: {
+    enabled: true,
+  },
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(data, request) {
+    async sendResetPassword(data) {
       await resend.emails.send({
         from: "",
         to: data.user.email,
@@ -26,13 +36,6 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
-      ac,
-      roles: {
-        ...roles,
-      },
-      schema: {
-        organization: {},
-      },
       async sendInvitationEmail(data) {
         const inviteLink = `${process.env.BETTER_AUTH_URL}/accept-invitation/${data.id}`;
         resend.emails.send({

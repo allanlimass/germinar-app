@@ -4,10 +4,10 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Church } from "@/lib/validations/church";
-import { ChurchActionCell } from "./church-action-cell";
+import { Branch } from "@/lib/validations/branch";
+import { BranchActionCell } from "./branch-action-cell";
 
-export const columns: ColumnDef<Church>[] = [
+export const columns: ColumnDef<Branch>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -72,9 +72,9 @@ export const columns: ColumnDef<Church>[] = [
     id: "actions",
     cell: ({ row }) => {
       const id = row.original.id;
-      const path = "/organization/churches";
+      const path = "/organization/branches";
 
-      return <ChurchActionCell id={id} path={path} />;
+      return <BranchActionCell id={id} path={path} />;
     },
   },
 ];

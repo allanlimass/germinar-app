@@ -1,4 +1,4 @@
-import { deleteChurchAction } from "@/actions/church-actions";
+import { deleteBranchAction } from "@/actions/branch-actions";
 import { authClient } from "@/lib/auth-client";
 import {
   AlertDialog,
@@ -16,7 +16,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteChurchSchema } from "@/lib/validations/church";
+import { deleteBranchSchema } from "@/lib/validations/branch";
 import z from "zod";
 import {
   DropdownMenu,
@@ -28,12 +28,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, PencilIcon, TrashIcon } from "lucide-react";
 
-interface ChurchActionCellProps {
+interface BranchActionCellProps {
   id: string;
   path: string;
 }
 
-export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
+export function BranchActionCell({ id, path }: BranchActionCellProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -41,17 +41,11 @@ export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
     router.push(`${path}/${id}`);
   };
 
-  const handleAccess = async (organizationId: string) => {
-    try {
-      await authClient.organization.setActive({ organizationId });
-      toast.success("Igreja acessada com sucesso!");
-      router.refresh();
-    } catch {
-      toast.error("Erro ao acessar igreja.");
-    }
+  const handleAccess = () => {
+    router.push(`/branch/${id}/dashboard`);
   };
 
-  const deleteChurch = useAction(deleteChurchAction, {
+  const deleteBranch = useAction(deleteBranchAction, {
     onSuccess: () => {
       toast.success("Igreja excluída com sucesso!");
       router.refresh();
@@ -62,8 +56,8 @@ export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
     },
   });
 
-  const handleDelete = (data: z.infer<typeof deleteChurchSchema>) => {
-    deleteChurch.execute(data);
+  const handleDelete = (data: z.infer<typeof deleteBranchSchema>) => {
+    deleteBranch.execute(data);
   };
 
   return (
@@ -99,10 +93,7 @@ export function ChurchActionCell({ id, path }: ChurchActionCellProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => handleAccess(id)}
-            className="cursor-pointer"
-          >
+          <DropdownMenuItem onClick={handleAccess} className="cursor-pointer">
             <EyeIcon className="mr-2 h-4 w-4" />
             Acessar
           </DropdownMenuItem>

@@ -2,17 +2,17 @@
 
 import { actionClient } from "@/lib/safe-action/safe-action";
 import {
-  createChurchSchema,
-  updateChurchSchema,
-  deleteChurchSchema,
-} from "@/lib/validations/church";
+  createBranchSchema,
+  updateBranchSchema,
+  deleteBranchSchema,
+} from "@/lib/validations/branch";
 import { db } from "@/db";
 import { branch } from "@/db/schema/organization";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
-export const createChurchAction = actionClient
-  .inputSchema(createChurchSchema)
+export const createBranchAction = actionClient
+  .inputSchema(createBranchSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId } = ctx;
 
@@ -23,7 +23,7 @@ export const createChurchAction = actionClient
 
     const path = parentId ? `${parentId}.${newId}` : newId;
 
-    const [newChurch] = await db
+    const [newBranch] = await db
       .insert(branch)
       .values({
         ...parsedInput,
@@ -36,11 +36,11 @@ export const createChurchAction = actionClient
         id: branch.id,
       });
 
-    return newChurch;
+    return newBranch;
   });
 
-export const updateChurchAction = actionClient
-  .inputSchema(updateChurchSchema)
+export const updateBranchAction = actionClient
+  .inputSchema(updateBranchSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { id, ...updateData } = parsedInput;
 
@@ -54,7 +54,7 @@ export const updateChurchAction = actionClient
 
     const path = parentId ? `${parentId}.${id}` : id;
 
-    const [updatedChurch] = await db
+    const [updatedBranch] = await db
       .update(branch)
       .set({
         ...updateData,
@@ -64,11 +64,11 @@ export const updateChurchAction = actionClient
       .where(eq(branch.id, id))
       .returning({ id: branch.id });
 
-    return updatedChurch;
+    return updatedBranch;
   });
 
-export const deleteChurchAction = actionClient
-  .inputSchema(deleteChurchSchema)
+export const deleteBranchAction = actionClient
+  .inputSchema(deleteBranchSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { id } = parsedInput;
 
@@ -76,10 +76,10 @@ export const deleteChurchAction = actionClient
       throw new Error("ID da filial é obrigatório para exclusão.");
     }
 
-    const deletedChurch = await db
+    const deletedBranch = await db
       .delete(branch)
       .where(eq(branch.id, id))
       .returning({ id: branch.id });
 
-    return deletedChurch;
+    return deletedBranch;
   });

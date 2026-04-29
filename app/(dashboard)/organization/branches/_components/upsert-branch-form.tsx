@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  createChurchAction,
-  updateChurchAction,
-} from "@/actions/church-actions";
+  createBranchAction,
+  updateBranchAction,
+} from "@/actions/branch-actions";
 import { Button } from "@/components/ui/button";
 import {
   FieldGroup,
@@ -22,16 +22,12 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import { federativeUnits } from "@/data/federative-units";
+import { PatternFormat } from "react-number-format";
 import {
-  formatCnpj,
-  formatPhoneNumber,
-  formatZipCode,
-} from "@/lib/utils/services";
-import {
-  Church,
-  createChurchSchema,
-  CreateChurchInput,
-} from "@/lib/validations/church";
+  Branch,
+  createBranchSchema,
+  CreateBranchInput,
+} from "@/lib/validations/branch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -41,23 +37,23 @@ import { toast } from "sonner";
 import React from "react";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 
-interface ChurchOption {
+interface BranchOption {
   id: string;
   name: string;
   path: string | null;
 }
 
-interface UpsertChurchFormProps {
-  initialData?: Church;
-  headquarters?: ChurchOption[];
-  regionals?: ChurchOption[];
+interface UpsertBranchFormProps {
+  initialData?: Branch;
+  headquarters?: BranchOption[];
+  regionals?: BranchOption[];
 }
 
-export function UpsertChurchForm({
+export function UpsertBranchForm({
   initialData,
   headquarters = [],
   regionals = [],
-}: UpsertChurchFormProps) {
+}: UpsertBranchFormProps) {
   const router = useRouter();
 
   const submitTypeRef = React.useRef<"default" | "continue">("default");
@@ -65,8 +61,8 @@ export function UpsertChurchForm({
 
   const parentId = initialData?.path?.split(".").slice(0, -1).join(".");
 
-  const form = useForm<CreateChurchInput>({
-    resolver: zodResolver(createChurchSchema),
+  const form = useForm<CreateBranchInput>({
+    resolver: zodResolver(createBranchSchema),
     defaultValues: {
       parentId: parentId ?? "",
       name: initialData?.name ?? "",
@@ -84,7 +80,7 @@ export function UpsertChurchForm({
     },
   });
 
-  const createChurch = useAction(createChurchAction, {
+  const createBranch = useAction(createBranchAction, {
     onSuccess: () => {
       toast.success("Igreja criada com sucesso!");
       if (submitTypeRef.current === "continue") {
@@ -92,34 +88,34 @@ export function UpsertChurchForm({
         router.refresh();
         return;
       }
-      router.push("/organization/churches");
+      router.push("/organization/branches");
     },
     onError: (ctx) => {
       toast.error("Erro ao criar igreja: " + ctx.error.serverError);
     },
   });
 
-  const updateChurch = useAction(updateChurchAction, {
+  const updateBranch = useAction(updateBranchAction, {
     onSuccess: () => {
       toast.success("Igreja atualizada com sucesso!");
       if (submitTypeRef.current === "continue") {
         router.refresh();
         return;
       }
-      router.push("/organization/churches");
+      router.push("/organization/branches");
     },
     onError: ({ error }) => {
       toast.error("Erro ao atualizar igreja: " + error.serverError);
     },
   });
 
-  const isPending = createChurch.isPending || updateChurch.isPending;
+  const isPending = createBranch.isPending || updateBranch.isPending;
 
-  const onSubmit = (data: CreateChurchInput) => {
+  const onSubmit = (data: CreateBranchInput) => {
     if (isEditing && initialData) {
-      updateChurch.execute({ ...data, id: initialData.id });
+      updateBranch.execute({ ...data, id: initialData.id });
     } else {
-      createChurch.execute({ ...data });
+      createBranch.execute({ ...data });
     }
   };
   return (
@@ -189,9 +185,9 @@ export function UpsertChurchForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              {headquarters.map((church) => (
-                                <SelectItem key={church.id} value={church.id}>
-                                  {church.name}
+                              {headquarters.map((branch) => (
+                                <SelectItem key={branch.id} value={branch.id}>
+                                  {branch.name}
                                 </SelectItem>
                               ))}
                             </SelectGroup>
@@ -225,9 +221,9 @@ export function UpsertChurchForm({
                             {headquarters.length > 0 && (
                               <SelectGroup>
                                 <SelectLabel>Matriz</SelectLabel>
-                                {headquarters.map((church) => (
-                                  <SelectItem key={church.id} value={church.id}>
-                                    {church.name}
+                                {headquarters.map((branch) => (
+                                  <SelectItem key={branch.id} value={branch.id}>
+                                    {branch.name}
                                   </SelectItem>
                                 ))}
                               </SelectGroup>
@@ -235,9 +231,9 @@ export function UpsertChurchForm({
                             {regionals.length > 0 && (
                               <SelectGroup>
                                 <SelectLabel>Regionais</SelectLabel>
-                                {regionals.map((church) => (
-                                  <SelectItem key={church.id} value={church.id}>
-                                    {church.name}
+                                {regionals.map((branch) => (
+                                  <SelectItem key={branch.id} value={branch.id}>
+                                    {branch.name}
                                   </SelectItem>
                                 ))}
                               </SelectGroup>
@@ -284,7 +280,17 @@ export function UpsertChurchForm({
                         placeholder="Digite o CNPJ"
                         maxLength={18}
                         onChange={(e) =>
-                          field.onChange(formatCnpj(e.target.value))
+                          field.onChange(() => {
+                            <PatternFormat
+                              format="##.###.###/####-##"
+                              allowEmptyFormatting
+                              customInput={Input}
+                              value={e.target.value}
+                              onValueChange={(values) => {
+                                field.onChange(values.value);
+                              }}
+                            />;
+                          })
                         }
                       />
                       {fieldState.invalid && (
@@ -328,7 +334,17 @@ export function UpsertChurchForm({
                         placeholder="Digite o telefone"
                         maxLength={15}
                         onChange={(e) =>
-                          field.onChange(formatPhoneNumber(e.target.value))
+                          field.onChange(() => {
+                            <PatternFormat
+                              format="(##) #####-####"
+                              allowEmptyFormatting
+                              customInput={Input}
+                              value={e.target.value}
+                              onValueChange={(values) => {
+                                field.onChange(values.value);
+                              }}
+                            />;
+                          })
                         }
                       />
                       {fieldState.invalid && (
@@ -353,7 +369,17 @@ export function UpsertChurchForm({
                         placeholder="Digite o CEP"
                         maxLength={9}
                         onChange={(e) =>
-                          field.onChange(formatZipCode(e.target.value))
+                          field.onChange(() => {
+                            <PatternFormat
+                              format="##.###-###"
+                              allowEmptyFormatting
+                              customInput={Input}
+                              value={e.target.value}
+                              onValueChange={(values) => {
+                                field.onChange(values.value);
+                              }}
+                            />;
+                          })
                         }
                       />
                       {fieldState.invalid && (

@@ -23,17 +23,17 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
-  createChurchSchema,
-  CreateChurchInput,
-} from "@/lib/validations/church";
+  CreateOrganizationInput,
+  createOrganizationSchema,
+} from "@/lib/validations/organization";
 import { createOrganization } from "@/actions/organization-actions";
 import { useAction } from "next-safe-action/hooks";
 
 export default function OrganizationForm() {
   const router = useRouter();
 
-  const form = useForm<CreateChurchInput>({
-    resolver: zodResolver(createChurchSchema),
+  const form = useForm<CreateOrganizationInput>({
+    resolver: zodResolver(createOrganizationSchema),
     defaultValues: {
       name: "",
     },
@@ -54,7 +54,7 @@ export default function OrganizationForm() {
     },
   });
 
-  const onSubmit = (data: CreateChurchInput) => {
+  const onSubmit = (data: CreateOrganizationInput) => {
     createOrganizationAction.execute(data);
   };
 

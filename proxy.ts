@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
 const publicRoutes = [
@@ -11,6 +10,7 @@ const publicRoutes = [
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const session = await auth.api.getSession({ headers: request.headers });
 
   const isPublicRoute = publicRoutes.some((route) => {
     if (route.exact) {
@@ -19,39 +19,40 @@ export async function proxy(request: NextRequest) {
     return pathname.startsWith(route.path);
   });
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  const isAuthenticated = !!session;
-  const hasOrganization = !!session?.session?.activeOrganizationId;
-  const isOnboardingRoute = pathname.startsWith("/welcome");
-  const isAcceptInvitationRoute = pathname.startsWith("/accept-invitation");
-
-  // 1. Usuários NÃO logados
-  if (!isAuthenticated) {
-    if (isPublicRoute) {
-      return NextResponse.next();
-    }
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (!session) {
+    return isPublicRoute
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // --- O fluxo abaixo garante que o usuário ESTÁ autenticado ---
+  const { user, session: sessionData } = session;
+  const hasOrganization = !!sessionData.activeOrganizationId;
 
-  // 2. Usuários logados SEM organização (em processo de Onboarding)
-  if (!hasOrganization) {
-    if (isOnboardingRoute || isAcceptInvitationRoute) {
-      return NextResponse.next();
-    }
+  if (!hasOrganization && !pathname.startsWith("/welcome")) {
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
-  // 3. Usuários logados COM organização
-  if ((isPublicRoute || isOnboardingRoute) && !isAcceptInvitationRoute) {
-    return NextResponse.redirect(new URL("/organization", request.url));
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+    const { role } = await auth.api.getActiveMemberRole({
+      headers: request.headers,
+    });
+    const isAdminOrOwner = role === "admin" || role === "owner";
+
+    if (isAdminOrOwner) {
+      return NextResponse.redirect(new URL("/organization", request.url));
+    }
+
+    if (user.lastActiveBranchId) {
+      return NextResponse.redirect(
+        new URL(`/branch/${user.lastActiveBranchId}`, request.url),
+      );
+    }
+
+    return NextResponse.redirect(
+      new URL("/organization/branches", request.url),
+    );
   }
 
-  // Rotas privadas liberadas (ex: /organization/*)
   return NextResponse.next();
 }
 
