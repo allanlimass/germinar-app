@@ -258,7 +258,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value}
-                        placeholder="Digite o nome"
+                        placeholder="Nome da filial"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -273,25 +273,15 @@ export function UpsertBranchForm({
                   render={({ field, fieldState }) => (
                     <Field className="col-span-1">
                       <FieldLabel htmlFor={field.name}>CNPJ</FieldLabel>
-                      <Input
-                        id={field.name}
+                      <PatternFormat
+                        format="##.###.###/####-##"
+                        customInput={Input}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o CNPJ"
-                        maxLength={18}
-                        onChange={(e) =>
-                          field.onChange(() => {
-                            <PatternFormat
-                              format="##.###.###/####-##"
-                              allowEmptyFormatting
-                              customInput={Input}
-                              value={e.target.value}
-                              onValueChange={(values) => {
-                                field.onChange(values.value);
-                              }}
-                            />;
-                          })
-                        }
+                        placeholder="00.000.000/0000-00"
+                        onValueChange={(values) => {
+                          field.onChange(values.value);
+                        }}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -312,7 +302,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o email"
+                        placeholder="exemplo@email.com"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -327,25 +317,15 @@ export function UpsertBranchForm({
                   render={({ field, fieldState }) => (
                     <Field>
                       <FieldLabel htmlFor={field.name}>Telefone</FieldLabel>
-                      <Input
-                        id={field.name}
+                      <PatternFormat
+                        format="(##) #####-####"
+                        customInput={Input}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o telefone"
-                        maxLength={15}
-                        onChange={(e) =>
-                          field.onChange(() => {
-                            <PatternFormat
-                              format="(##) #####-####"
-                              allowEmptyFormatting
-                              customInput={Input}
-                              value={e.target.value}
-                              onValueChange={(values) => {
-                                field.onChange(values.value);
-                              }}
-                            />;
-                          })
-                        }
+                        placeholder="(00) 00000-0000"
+                        onValueChange={(values) => {
+                          field.onChange(values.value);
+                        }}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -362,25 +342,15 @@ export function UpsertBranchForm({
                   render={({ field, fieldState }) => (
                     <Field className="col-span-1">
                       <FieldLabel htmlFor={field.name}>CEP</FieldLabel>
-                      <Input
-                        id={field.name}
+                      <PatternFormat
+                        format="#####-###"
+                        customInput={Input}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o CEP"
-                        maxLength={9}
-                        onChange={(e) =>
-                          field.onChange(() => {
-                            <PatternFormat
-                              format="##.###-###"
-                              allowEmptyFormatting
-                              customInput={Input}
-                              value={e.target.value}
-                              onValueChange={(values) => {
-                                field.onChange(values.value);
-                              }}
-                            />;
-                          })
-                        }
+                        placeholder="00000-000"
+                        onValueChange={(values) => {
+                          field.onChange(values.value);
+                        }}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -399,7 +369,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite a rua"
+                        placeholder="Nome da rua ou avenida"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -418,7 +388,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o número"
+                        placeholder="123"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -439,7 +409,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o complemento"
+                        placeholder="Apto, bloco, fundos, etc..."
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -458,7 +428,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite o bairro"
+                        placeholder="Nome do bairro"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -477,7 +447,7 @@ export function UpsertBranchForm({
                         id={field.name}
                         {...field}
                         value={field.value ?? ""}
-                        placeholder="Digite a cidade"
+                        placeholder="Nome da cidade"
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -497,7 +467,7 @@ export function UpsertBranchForm({
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione a UF" />
+                          <SelectValue placeholder="Selecione o estado" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>

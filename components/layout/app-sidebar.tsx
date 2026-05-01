@@ -30,7 +30,7 @@ export function AppSidebar({
   user: {
     name: string;
     email: string;
-    avatar?: string;
+    image?: string | null;
   };
   branches: {
     id: string;

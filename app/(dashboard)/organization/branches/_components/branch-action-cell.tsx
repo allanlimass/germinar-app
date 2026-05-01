@@ -42,7 +42,7 @@ export function BranchActionCell({ id, path }: BranchActionCellProps) {
   };
 
   const handleAccess = () => {
-    router.push(`/branch/${id}/dashboard`);
+    router.push(`/branch/${id}`);
   };
 
   const deleteBranch = useAction(deleteBranchAction, {

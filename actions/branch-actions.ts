@@ -10,11 +10,12 @@ import { db } from "@/db";
 import { branch } from "@/db/schema/organization";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { branchMember } from "@/db/schema/organization";
 
 export const createBranchAction = actionClient
   .inputSchema(createBranchSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, session } = ctx;
 
     const newId = randomUUID();
 
@@ -36,12 +37,18 @@ export const createBranchAction = actionClient
         id: branch.id,
       });
 
+    await db.insert(branchMember).values({
+      userId: session.user.id,
+      branchId: newBranch.id,
+      role: "admin",
+    });
+
     return newBranch;
   });
 
 export const updateBranchAction = actionClient
   .inputSchema(updateBranchSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
     const { id, ...updateData } = parsedInput;
 
     if (!id) {
@@ -69,7 +76,7 @@ export const updateBranchAction = actionClient
 
 export const deleteBranchAction = actionClient
   .inputSchema(deleteBranchSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
     const { id } = parsedInput;
 
     if (!id) {

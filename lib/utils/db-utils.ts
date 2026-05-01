@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/db";
 import { eq, and } from "drizzle-orm";
@@ -45,12 +45,12 @@ export const getBranchContext = cache(async (branchId: string) => {
   });
 
   if (!branchMember) {
-    return notFound();
+    redirect("/organization");
   }
 
   return {
     session,
     organizationId,
-    branchMemberRole: branchMember.role,
+    branchMember,
   };
 });
