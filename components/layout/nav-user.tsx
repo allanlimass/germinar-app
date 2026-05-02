@@ -53,21 +53,9 @@ export function NavUser({
       },
     });
 
-  const handleSetOrganization = (organizationId: string) =>
-    authClient.organization.setActive(
-      {
-        organizationId,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Igreja selecionada com sucesso");
-          router.refresh();
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-        },
-      },
-    );
+  const handleSetBranch = (branchId: string) => {
+    router.push(`/branch/${branchId}`);
+  };
 
   return (
     <SidebarMenu>
@@ -117,7 +105,7 @@ export function NavUser({
               {branches?.map((branch) => (
                 <DropdownMenuItem
                   key={branch.id}
-                  onClick={() => handleSetOrganization(branch.id)}
+                  onClick={() => handleSetBranch(branch.id)}
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={branch.logo} alt={branch.name} />

@@ -1,6 +1,6 @@
 import { getSessionContext } from "@/lib/utils/db-utils";
 import { UpsertBranchForm } from "../_components/upsert-branch-form";
-import { listBranchById, listBranchesByType } from "@/db/queries/branches";
+import { listBranchById, listBranchesByType } from "@/db/queries/branch";
 
 export default async function EditBranchPage({
   params,

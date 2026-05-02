@@ -19,26 +19,204 @@ import {
 import { TerminalIcon, ChevronRight, SunIcon, MoonIcon } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-
-import { data } from "@/data/sidebar-data";
+import {
+  Inbox,
+  User,
+  Church,
+  DollarSign,
+  Megaphone,
+  ArrowDownUp,
+  Landmark,
+  Gauge,
+  Group,
+  Users,
+  FileText,
+  Award,
+  HandHeart,
+  Briefcase,
+} from "lucide-react";
 
 export function AppSidebar({
   user,
+  role,
+  activeBranchId,
   branches,
   ...props
-}: React.ComponentProps<typeof Sidebar> & {
-  user: {
-    name: string;
-    email: string;
-    image?: string | null;
-  };
-  branches: {
-    id: string;
-    name: string;
-    logo?: string;
-  }[];
+}: {
+  user: { name: string; email: string; image?: string | null };
+  role: { role: "owner" | "admin" | "member" };
+  activeBranchId?: string | null;
+  branches: { id: string; name: string; logo?: string }[];
+  props?: React.ComponentProps<typeof Sidebar>;
 }) {
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
+  const data = {
+    navOrganization: [
+      {
+        title: "Organização",
+        url: "#",
+        icon: Briefcase,
+        isActive: false,
+        items: [
+          {
+            title: "Dashboard",
+            url: "/organization",
+            icon: Gauge,
+            isActive: false,
+          },
+          {
+            title: "Filiais",
+            url: "/organization/branches",
+            icon: Church,
+            isActive: false,
+          },
+          {
+            title: "Usuários",
+            url: "/organization/users",
+            icon: Users,
+            isActive: false,
+          },
+          {
+            title: "Cargos",
+            url: "/organization/positions",
+            icon: Award,
+            isActive: false,
+          },
+          {
+            title: "Funções",
+            url: "/organization/functions",
+            icon: HandHeart,
+            isActive: false,
+          },
+          {
+            title: "Relatórios",
+            url: "/organization/reports",
+            icon: FileText,
+            isActive: false,
+          },
+        ],
+      },
+    ],
+    navBranch: [
+      {
+        title: "Administração",
+        url: "#",
+        icon: Church,
+        isActive: false,
+        items: [
+          {
+            title: "Dashboard",
+            url: `/branch/${activeBranchId}/administration`,
+            icon: Gauge,
+            isActive: false,
+          },
+          {
+            title: "Usuários",
+            url: `/branch/${activeBranchId}/administration/branch-members`,
+            icon: Users,
+            isActive: false,
+          },
+          {
+            title: "Relatórios",
+            url: `/branch/${activeBranchId}/administration/reports`,
+            icon: FileText,
+            isActive: false,
+          },
+        ],
+      },
+      {
+        title: "Pessoas",
+        url: "#",
+        icon: User,
+        isActive: false,
+        items: [
+          {
+            title: "Dashboard",
+            url: `/branch/${activeBranchId}/people`,
+            icon: Gauge,
+            isActive: false,
+          },
+          {
+            title: "Membros",
+            url: `/branch/${activeBranchId}/people/members`,
+            icon: Users,
+            isActive: false,
+          },
+          {
+            title: "Relatórios",
+            url: `/branch/${activeBranchId}/people/reports`,
+            icon: FileText,
+            isActive: false,
+          },
+        ],
+      },
+      {
+        title: "Finanças",
+        url: "#",
+        icon: DollarSign,
+        isActive: false,
+        items: [
+          {
+            title: "Dashboard",
+            url: `/branch/${activeBranchId}/finance`,
+            icon: Gauge,
+            isActive: false,
+          },
+          {
+            title: "Transações",
+            url: `/branch/${activeBranchId}/finance/transactions`,
+            icon: ArrowDownUp,
+            isActive: false,
+          },
+          {
+            title: "Fornecedores",
+            url: `/branch/${activeBranchId}/finance/suppliers`,
+            icon: Inbox,
+            isActive: false,
+          },
+          {
+            title: "Plano de Contas",
+            url: `/branch/${activeBranchId}/finance/chart-of-accounts`,
+            icon: Inbox,
+            isActive: false,
+          },
+          {
+            title: "Centros de Custo",
+            url: `/branch/${activeBranchId}/finance/cost-centers`,
+            icon: Inbox,
+            isActive: false,
+          },
+          {
+            title: "Contas",
+            url: `/branch/${activeBranchId}/finance/accounts`,
+            icon: Landmark,
+            isActive: false,
+          },
+          {
+            title: "Relatórios",
+            url: `/branch/${activeBranchId}/finance/reports`,
+            icon: Inbox,
+            isActive: false,
+          },
+        ],
+      },
+      {
+        title: "Comunicação",
+        url: "#",
+        icon: Megaphone,
+        isActive: false,
+      },
+      {
+        title: "Células",
+        url: "#",
+        icon: Group,
+        isActive: false,
+      },
+    ],
+  };
+
+  const [activeItem, setActiveItem] = React.useState(
+    role.role === "member" ? data.navBranch[0] : data.navOrganization[0],
+  );
   const { theme, setTheme } = useTheme();
 
   const { setOpen } = useSidebar();
@@ -57,7 +235,7 @@ export function AppSidebar({
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="#">
+                <Link href="#">
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <TerminalIcon className="size-4" />
                   </div>
@@ -65,7 +243,7 @@ export function AppSidebar({
                     <span className="truncate font-medium">Acme Inc</span>
                     <span className="truncate text-xs">Enterprise</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -74,25 +252,48 @@ export function AppSidebar({
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.navMain.map((item) => (
-                  <SidebarMenuItem className="py-1" key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={{
-                        children: item.title,
-                        hidden: false,
-                      }}
-                      onClick={() => {
-                        setActiveItem(item);
-                        setOpen(true);
-                      }}
-                      isActive={activeItem?.title === item.title}
-                      className="px-2.5 md:px-2"
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {role.role !== "member" &&
+                  data.navOrganization.map((item) => (
+                    <SidebarMenuItem className="py-1" key={item.title}>
+                      <SidebarMenuButton
+                        tooltip={{
+                          children: item.title,
+                          hidden: false,
+                        }}
+                        onClick={() => {
+                          setActiveItem(item);
+                          setOpen(true);
+                        }}
+                        isActive={activeItem?.title === item.title}
+                        className="px-2.5 md:px-2"
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+              <SidebarMenu>
+                {activeBranchId &&
+                  data.navBranch.map((item) => (
+                    <SidebarMenuItem className="py-1" key={item.title}>
+                      <SidebarMenuButton
+                        tooltip={{
+                          children: item.title,
+                          hidden: false,
+                        }}
+                        onClick={() => {
+                          setActiveItem(item);
+                          setOpen(true);
+                        }}
+                        isActive={activeItem?.title === item.title}
+                        className="px-2.5 md:px-2"
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

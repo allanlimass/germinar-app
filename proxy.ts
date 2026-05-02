@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import {
+  getLastAccesedBranch,
+  setLastAccesedBranch,
+} from "@/lib/utils/branch-context";
 
 const publicRoutes = [
   { path: "/", exact: true },
@@ -42,9 +46,11 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/organization", request.url));
     }
 
-    if (user.lastActiveBranchId) {
+    const lastAccesedBranchId = await getLastAccesedBranch();
+
+    if (lastAccesedBranchId) {
       return NextResponse.redirect(
-        new URL(`/branch/${user.lastActiveBranchId}`, request.url),
+        new URL(`/branch/${lastAccesedBranchId}`, request.url),
       );
     }
 
@@ -53,7 +59,20 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (pathname.startsWith("/branch/")) {
+    const segments = pathname.split("/");
+    const branchId = segments[2];
+
+    const currentCookie = await getLastAccesedBranch();
+
+    if (branchId !== currentCookie) {
+      await setLastAccesedBranch(branchId);
+    }
+  }
+
+  return response;
 }
 
 export const config = {

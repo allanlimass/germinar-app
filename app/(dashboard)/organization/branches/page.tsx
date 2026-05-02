@@ -2,7 +2,7 @@ import { DataTable } from "@/components/data-table";
 import { columns } from "./_components/branch-columns";
 import PageLayout from "@/components/layout/page-layout";
 import { PageLayoutActions } from "@/components/layout/page-layout-actions";
-import { listBranches } from "@/db/queries/branches";
+import { listBranches } from "@/db/queries/branch";
 import { getSessionContext } from "@/lib/utils/db-utils";
 
 export default async function BranchesPage() {

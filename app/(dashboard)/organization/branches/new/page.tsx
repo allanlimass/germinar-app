@@ -1,5 +1,5 @@
 import { UpsertBranchForm } from "../_components/upsert-branch-form";
-import { listBranchesByType } from "@/db/queries/branches";
+import { listBranchesByType } from "@/db/queries/branch";
 
 export default async function NewBranchPage() {
   const [headquarters, regionals] = await Promise.all([
