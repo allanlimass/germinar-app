@@ -1,6 +1,6 @@
 import { UpsertChurchMemberForm } from "../_components/upsert-church-member-form";
-import { listChurchPositions } from "@/db/queries/position";
-import { listChurchFunctions } from "@/db/queries/function";
+import { listChurchPositions } from "@/db/queries/positions";
+import { listChurchFunctions } from "@/db/queries/functions";
 import { getSessionContext } from "@/lib/utils/db-utils";
 
 export default async function NewChurchMemberPage() {

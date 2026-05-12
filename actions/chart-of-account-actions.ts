@@ -1,6 +1,6 @@
 "use server";
 
-import { actionClient } from "@/lib/safe-action/safe-action";
+import { actionClient } from "@/lib/safe-action";
 import { db } from "@/db";
 import { financeChartOfAccounts } from "@/db/schema/finance";
 import { and, eq } from "drizzle-orm";

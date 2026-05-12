@@ -1,13 +1,13 @@
 "use server";
 
-import { authActionClient } from "@/lib/safe-action/safe-action";
+import { authClient } from "@/lib/safe-action";
 import { auth } from "@/lib/auth";
 import { slugify } from "@/lib/utils/services";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createOrganizationSchema } from "@/lib/validations/organization";
 
-export const createOrganization = authActionClient
+export const createOrganization = authClient
   .inputSchema(createOrganizationSchema)
   .action(async ({ parsedInput }) => {
     const name = parsedInput.name;

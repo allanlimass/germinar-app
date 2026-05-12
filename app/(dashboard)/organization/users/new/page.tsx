@@ -1,5 +1,5 @@
 import { getSessionContext } from "@/lib/utils/db-utils";
-import { UpsertUserForm } from "../_components/upsert-user-form";
+import { UpsertUserForm } from "@/modules/organization/users/_components/upsert-form";
 
 export default async function NewUserPage() {
   const { organizationId } = await getSessionContext();

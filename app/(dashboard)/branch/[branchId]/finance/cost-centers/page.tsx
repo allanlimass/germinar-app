@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/data-table";
-import { listCostCenters } from "@/db/queries/cost-center";
+import { listCostCenters } from "@/db/queries/cost-centers";
 import { costCenterColumns } from "./_components/cost-center-columns";
 import { getSessionContext } from "@/lib/utils/db-utils";
 import PageLayout from "@/components/layout/page-layout";

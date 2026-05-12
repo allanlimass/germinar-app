@@ -37,20 +37,20 @@ export const getBranchContext = cache(async (branchId: string) => {
     redirect("/onboarding");
   }
 
-  const branchMember = await db.query.branchMember.findFirst({
-    where: and(
-      eq(branchMembers.branchId, branchId),
-      eq(branchMembers.userId, session.user.id),
-    ),
-  });
+  // const branchMember = await db.query.branchMember.findFirst({
+  //   where: and(
+  //     eq(branchMembers.branchId, branchId),
+  //     eq(branchMembers.userId, session.user.id),
+  //   ),
+  // });
 
-  if (!branchMember) {
-    redirect("/organization");
-  }
+  // if (!branchMember) {
+  //   redirect("/organization");
+  // }
 
   return {
     session,
     organizationId,
-    branchMember,
+    // branchMember,
   };
 });

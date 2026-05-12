@@ -1,8 +1,8 @@
-import { listChurchFunctions } from "@/db/queries/function";
-import { listChurchPositions } from "@/db/queries/position";
+import { listChurchFunctions } from "@/db/queries/functions";
+import { listChurchPositions } from "@/db/queries/positions";
 import { getSessionContext } from "@/lib/utils/db-utils";
 import { UpsertChurchMemberForm } from "../_components/upsert-church-member-form";
-import { getChurchMemberById } from "@/db/queries/church-member";
+import { getChurchMemberById } from "@/db/queries/church-members";
 
 export default async function EditChurcheMemberPage({
   params,

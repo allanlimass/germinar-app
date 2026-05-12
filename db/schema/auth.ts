@@ -7,9 +7,7 @@ import {
   index,
   uniqueIndex,
   pgEnum,
-  uuid,
 } from "drizzle-orm/pg-core";
-import { branch } from "./organization";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -17,10 +15,6 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  lastActiveBranchId: uuid("last_active_branch_id").references(
-    () => branch.id,
-    { onDelete: "set null" },
-  ),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -148,15 +142,11 @@ export const invitation = pgTable(
   ],
 );
 
-export const userRelations = relations(user, ({ many, one }) => ({
+export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
-  lastActiveBranch: one(branch, {
-    fields: [user.lastActiveBranchId],
-    references: [branch.id],
-  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

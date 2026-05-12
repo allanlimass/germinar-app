@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { getUserBranches } from "@/db/queries/branch";
+import { getBranchesByUserId } from "@/modules/organization/branches/queries";
 import { auth } from "@/lib/auth";
 import { getLastAccesedBranch } from "@/lib/utils/branch-context";
 import { getSessionContext } from "@/lib/utils/db-utils";
@@ -12,7 +12,7 @@ export default async function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { session } = await getSessionContext();
+  const { session, organizationId } = await getSessionContext();
 
   const user = session.user;
 
@@ -20,7 +20,8 @@ export default async function PrivateLayout({
 
   const activeBranchId = await getLastAccesedBranch();
 
-  const branches = await getUserBranches(user.id);
+  const branches = await getBranchesByUserId(organizationId, user.id);
+
   return (
     <SidebarProvider
       style={

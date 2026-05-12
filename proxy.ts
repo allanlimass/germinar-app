@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import {
-  getLastAccesedBranch,
-  setLastAccesedBranch,
-} from "@/lib/utils/branch-context";
 
 const publicRoutes = [
   { path: "/", exact: true },
@@ -11,6 +7,8 @@ const publicRoutes = [
   { path: "/register", exact: true },
   { path: "/accept-invitation", exact: false },
 ];
+
+const COOKIE_NAME = "lastBranchId";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -46,7 +44,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/organization", request.url));
     }
 
-    const lastAccesedBranchId = await getLastAccesedBranch();
+    const lastAccesedBranchId = request.cookies.get(COOKIE_NAME)?.value;
 
     if (lastAccesedBranchId) {
       return NextResponse.redirect(
@@ -65,10 +63,15 @@ export async function proxy(request: NextRequest) {
     const segments = pathname.split("/");
     const branchId = segments[2];
 
-    const currentCookie = await getLastAccesedBranch();
+    const currentCookie = request.cookies.get(COOKIE_NAME)?.value;
 
     if (branchId !== currentCookie) {
-      await setLastAccesedBranch(branchId);
+      response.cookies.set(COOKIE_NAME, branchId, {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
     }
   }
 

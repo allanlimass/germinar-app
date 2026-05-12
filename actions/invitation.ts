@@ -1,4 +1,4 @@
-import { actionClient } from "@/lib/safe-action/safe-action";
+import { actionClient } from "@/lib/safe-action";
 import z from "zod";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

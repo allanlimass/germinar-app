@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TerminalIcon, ChevronRight, SunIcon, MoonIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Inbox,
@@ -49,6 +50,16 @@ export function AppSidebar({
   branches: { id: string; name: string; logo?: string }[];
   props?: React.ComponentProps<typeof Sidebar>;
 }) {
+  const pathname = usePathname();
+
+  const currentBranchId = React.useMemo(() => {
+    if (pathname.startsWith("/branch/")) {
+      const segments = pathname.split("/");
+      return segments[2] || activeBranchId;
+    }
+    return activeBranchId;
+  }, [pathname, activeBranchId]);
+
   const data = {
     navOrganization: [
       {
@@ -76,18 +87,6 @@ export function AppSidebar({
             isActive: false,
           },
           {
-            title: "Cargos",
-            url: "/organization/positions",
-            icon: Award,
-            isActive: false,
-          },
-          {
-            title: "Funções",
-            url: "/organization/functions",
-            icon: HandHeart,
-            isActive: false,
-          },
-          {
             title: "Relatórios",
             url: "/organization/reports",
             icon: FileText,
@@ -105,19 +104,31 @@ export function AppSidebar({
         items: [
           {
             title: "Dashboard",
-            url: `/branch/${activeBranchId}/administration`,
+            url: `/branch/${currentBranchId}/administration`,
             icon: Gauge,
             isActive: false,
           },
           {
+            title: "Cargos",
+            url: `/branch/${currentBranchId}/administration/positions`,
+            icon: Award,
+            isActive: false,
+          },
+          {
+            title: "Funções",
+            url: `/branch/${currentBranchId}/administration/functions`,
+            icon: HandHeart,
+            isActive: false,
+          },
+          {
             title: "Usuários",
-            url: `/branch/${activeBranchId}/administration/branch-members`,
+            url: `/branch/${currentBranchId}/administration/branch-members`,
             icon: Users,
             isActive: false,
           },
           {
             title: "Relatórios",
-            url: `/branch/${activeBranchId}/administration/reports`,
+            url: `/branch/${currentBranchId}/administration/reports`,
             icon: FileText,
             isActive: false,
           },
@@ -131,19 +142,19 @@ export function AppSidebar({
         items: [
           {
             title: "Dashboard",
-            url: `/branch/${activeBranchId}/people`,
+            url: `/branch/${currentBranchId}/people`,
             icon: Gauge,
             isActive: false,
           },
           {
             title: "Membros",
-            url: `/branch/${activeBranchId}/people/members`,
+            url: `/branch/${currentBranchId}/people/members`,
             icon: Users,
             isActive: false,
           },
           {
             title: "Relatórios",
-            url: `/branch/${activeBranchId}/people/reports`,
+            url: `/branch/${currentBranchId}/people/reports`,
             icon: FileText,
             isActive: false,
           },
@@ -157,43 +168,43 @@ export function AppSidebar({
         items: [
           {
             title: "Dashboard",
-            url: `/branch/${activeBranchId}/finance`,
+            url: `/branch/${currentBranchId}/finance`,
             icon: Gauge,
             isActive: false,
           },
           {
             title: "Transações",
-            url: `/branch/${activeBranchId}/finance/transactions`,
+            url: `/branch/${currentBranchId}/finance/transactions`,
             icon: ArrowDownUp,
             isActive: false,
           },
           {
             title: "Fornecedores",
-            url: `/branch/${activeBranchId}/finance/suppliers`,
+            url: `/branch/${currentBranchId}/finance/suppliers`,
             icon: Inbox,
             isActive: false,
           },
           {
             title: "Plano de Contas",
-            url: `/branch/${activeBranchId}/finance/chart-of-accounts`,
+            url: `/branch/${currentBranchId}/finance/chart-of-accounts`,
             icon: Inbox,
             isActive: false,
           },
           {
             title: "Centros de Custo",
-            url: `/branch/${activeBranchId}/finance/cost-centers`,
+            url: `/branch/${currentBranchId}/finance/cost-centers`,
             icon: Inbox,
             isActive: false,
           },
           {
             title: "Contas",
-            url: `/branch/${activeBranchId}/finance/accounts`,
+            url: `/branch/${currentBranchId}/finance/accounts`,
             icon: Landmark,
             isActive: false,
           },
           {
             title: "Relatórios",
-            url: `/branch/${activeBranchId}/finance/reports`,
+            url: `/branch/${currentBranchId}/finance/reports`,
             icon: Inbox,
             isActive: false,
           },
@@ -274,7 +285,7 @@ export function AppSidebar({
                   ))}
               </SidebarMenu>
               <SidebarMenu>
-                {activeBranchId &&
+                {currentBranchId &&
                   data.navBranch.map((item) => (
                     <SidebarMenuItem className="py-1" key={item.title}>
                       <SidebarMenuButton

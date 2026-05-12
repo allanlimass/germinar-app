@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/data-table";
 import { churchMemberColumns } from "@/app/(dashboard)/people/members/_components/church-member-columns";
-import { listChurchMembers } from "@/db/queries/church-member";
+import { listChurchMembers } from "@/db/queries/church-members";
 import { getBranchContext } from "@/lib/utils/db-utils";
 import { notFound } from "next/navigation";
 import PageLayout from "@/components/layout/page-layout";

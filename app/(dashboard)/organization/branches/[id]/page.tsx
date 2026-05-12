@@ -1,6 +1,9 @@
 import { getSessionContext } from "@/lib/utils/db-utils";
-import { UpsertBranchForm } from "../_components/upsert-branch-form";
-import { listBranchById, listBranchesByType } from "@/db/queries/branch";
+import { UpsertBranchForm } from "@/modules/organization/branches/_components/upsert-form";
+import {
+  getBranchById,
+  getBranchesByType,
+} from "@/modules/organization/branches/queries";
 
 export default async function EditBranchPage({
   params,
@@ -12,9 +15,9 @@ export default async function EditBranchPage({
   const { id } = await params;
 
   const [branch, headquarters, regionals] = await Promise.all([
-    listBranchById(id),
-    listBranchesByType("headquarters"),
-    listBranchesByType("regional"),
+    getBranchById(id),
+    getBranchesByType("headquarters"),
+    getBranchesByType("regional"),
   ]);
 
   return (

@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { churchMember } from "@/db/schema/people";
-import { actionClient } from "@/lib/safe-action/safe-action";
+import { actionClient } from "@/lib/safe-action";
 import {
   deleteChurchMemberSchema,
   createChurchMemberSchema,
