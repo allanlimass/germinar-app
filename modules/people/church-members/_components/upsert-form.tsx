@@ -4,14 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  ChurchMemberFormSchema,
-  CreateChurchMemberInput,
-  CreateChurchMemberOutput,
-  UpdateChurchMemberInput,
-  UpdateChurchMemberOutput,
+  ChurchMember,
+  CreateChurchMemberSchema,
   createChurchMemberSchema,
-  updateChurchMemberSchema,
-} from "@/lib/validations/church-member";
+} from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon, User } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -19,10 +15,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import React from "react";
-import {
-  createChurchMember,
-  updateChurchMember,
-} from "@/actions/church-member-actions";
+import { createChurchMember, updateChurchMember } from "../actions";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -63,15 +56,17 @@ interface ChurchFunction {
 }
 
 interface UpsertChurchMemberFormProps {
-  initialData?: ChurchMemberFormSchema;
+  initialData?: ChurchMember;
   churchPositions: ChurchPosition[];
   churchFunctions: ChurchFunction[];
+  branchId: string;
 }
 
 export function UpsertChurchMemberForm({
   initialData,
   churchPositions,
   churchFunctions,
+  branchId,
 }: UpsertChurchMemberFormProps) {
   const router = useRouter();
 
@@ -80,24 +75,18 @@ export function UpsertChurchMemberForm({
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
-  const form = useForm<
-    CreateChurchMemberInput | UpdateChurchMemberInput,
-    unknown,
-    CreateChurchMemberOutput | UpdateChurchMemberOutput
-  >({
-    resolver: zodResolver(
-      isEditing ? updateChurchMemberSchema : createChurchMemberSchema,
-    ),
+  const form = useForm<CreateChurchMemberSchema>({
+    resolver: zodResolver(createChurchMemberSchema),
     defaultValues: {
       ...(isEditing && initialData ? { id: initialData.id } : {}),
       userId: initialData?.userId ?? null,
       churchPositionId: initialData?.churchPositionId ?? null,
       churchFunctionId: initialData?.churchFunctionId ?? null,
-      type: initialData?.type ?? "MEMBER",
+      type: initialData?.type ?? "member",
       photoUrl: initialData?.photoUrl ?? "",
       name: initialData?.name ?? "",
       birthDate: initialData?.birthDate ?? null,
-      gender: initialData?.gender ?? "MALE",
+      gender: initialData?.gender ?? "male",
       cpf: initialData?.cpf ?? "",
       email: initialData?.email ?? "",
       phone: initialData?.phone ?? "",
@@ -108,7 +97,7 @@ export function UpsertChurchMemberForm({
       complement: initialData?.complement ?? "",
       city: initialData?.city ?? "",
       state: initialData?.state ?? "",
-      status: initialData?.status ?? "ACTIVE",
+      status: initialData?.status ?? "active",
     },
   });
 
@@ -119,7 +108,7 @@ export function UpsertChurchMemberForm({
         form.reset();
         return;
       }
-      router.push("/people/members");
+      router.push(`/branch/${branchId}/people/members`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao criar membro: " + error.serverError);
@@ -132,16 +121,14 @@ export function UpsertChurchMemberForm({
       if (submitTypeRef.current === "continue") {
         return;
       }
-      router.push("/people/members");
+      router.push(`/branch/${branchId}/people/members`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao atualizar membro: " + error.serverError);
     },
   });
 
-  const onSubmit = (
-    data: CreateChurchMemberOutput | UpdateChurchMemberOutput,
-  ) => {
+  const onSubmit = (data: CreateChurchMemberSchema) => {
     if (isEditing && initialData) {
       updateChurchMemberAction.execute({ ...data, id: initialData.id });
     } else {
@@ -233,8 +220,8 @@ export function UpsertChurchMemberForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="MEMBER">Membro</SelectItem>
-                              <SelectItem value="VISITOR">Visitante</SelectItem>
+                              <SelectItem value="member">Membro</SelectItem>
+                              <SelectItem value="visitor">Visitante</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -260,8 +247,8 @@ export function UpsertChurchMemberForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="ACTIVE">Ativo</SelectItem>
-                              <SelectItem value="INACTIVE">Inativo</SelectItem>
+                              <SelectItem value="active">Ativo</SelectItem>
+                              <SelectItem value="inactive">Inativo</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -368,8 +355,8 @@ export function UpsertChurchMemberForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="MALE">Masculino</SelectItem>
-                              <SelectItem value="FEMALE">Feminino</SelectItem>
+                              <SelectItem value="male">Masculino</SelectItem>
+                              <SelectItem value="female">Feminino</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>

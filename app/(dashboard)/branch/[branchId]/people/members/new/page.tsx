@@ -1,15 +1,22 @@
-import { UpsertChurchMemberForm } from "../_components/upsert-church-member-form";
-import { listChurchPositions } from "@/db/queries/positions";
-import { listChurchFunctions } from "@/db/queries/functions";
-import { getSessionContext } from "@/lib/utils/db-utils";
+import { UpsertChurchMemberForm } from "@/modules/people/church-members/_components/upsert-form";
+import { getChurchPositions } from "@/modules/administration/positions/queries";
+import { getChurchFunctions } from "@/modules/administration/functions/queries";
+import { getBranchContext } from "@/lib/utils/db-utils";
 
-export default async function NewChurchMemberPage() {
-  const { organizationId } = await getSessionContext();
-  const churchPositions = await listChurchPositions(organizationId);
-  const churchFunctions = await listChurchFunctions(organizationId);
+export default async function NewChurchMemberPage({
+  params,
+}: {
+  params: Promise<{ branchId: string }>;
+}) {
+  const { branchId } = await params;
+  const { organizationId } = await getBranchContext(branchId);
+
+  const churchPositions = await getChurchPositions(organizationId, branchId);
+  const churchFunctions = await getChurchFunctions(organizationId, branchId);
 
   return (
     <UpsertChurchMemberForm
+      branchId={branchId}
       churchPositions={churchPositions}
       churchFunctions={churchFunctions}
     />

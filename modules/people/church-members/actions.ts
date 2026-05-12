@@ -2,32 +2,34 @@
 
 import { db } from "@/db";
 import { churchMember } from "@/db/schema/people";
-import { actionClient } from "@/lib/safe-action";
+import { branchActionClient } from "@/lib/safe-action";
 import {
   deleteChurchMemberSchema,
   createChurchMemberSchema,
   updateChurchMemberSchema,
-} from "@/lib/validations/church-member";
+} from "./schemas";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export const createChurchMember = actionClient
+export const createChurchMember = branchActionClient
   .inputSchema(createChurchMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
 
-    revalidatePath("/people/members");
+    revalidatePath(`/branch/${branchId}/people/members`);
 
-    await db.insert(churchMember).values({ ...parsedInput, organizationId });
+    await db
+      .insert(churchMember)
+      .values({ organizationId, branchId, ...parsedInput });
   });
 
-export const updateChurchMember = actionClient
+export const updateChurchMember = branchActionClient
   .inputSchema(updateChurchMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
     const { id, ...data } = parsedInput;
 
-    revalidatePath("/people/members");
+    revalidatePath(`/branch/${branchId}/people/members`);
 
     await db
       .update(churchMember)
@@ -35,24 +37,26 @@ export const updateChurchMember = actionClient
       .where(
         and(
           eq(churchMember.id, id),
+          eq(churchMember.branchId, branchId),
           eq(churchMember.organizationId, organizationId),
         ),
       );
   });
 
-export const deleteChurchMember = actionClient
+export const deleteChurchMember = branchActionClient
   .inputSchema(deleteChurchMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
     const { id } = parsedInput;
 
-    revalidatePath("/people/members");
+    revalidatePath(`/branch/${branchId}/people/members`);
 
     await db
       .delete(churchMember)
       .where(
         and(
           eq(churchMember.id, id),
+          eq(churchMember.branchId, branchId),
           eq(churchMember.organizationId, organizationId),
         ),
       );

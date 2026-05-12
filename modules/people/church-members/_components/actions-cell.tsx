@@ -1,4 +1,4 @@
-import { deleteChurchMember } from "@/actions/church-member-actions";
+import { deleteChurchMember } from "../actions";
 import {
   AlertDialog,
   AlertDialogAction,

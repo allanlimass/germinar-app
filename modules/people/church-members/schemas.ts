@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { churchMember } from "@/db/schema/people";
 
 const nullableString = z
   .string()
@@ -6,18 +7,17 @@ const nullableString = z
   .nullable()
   .transform((value) => (value === "" || value === undefined ? null : value));
 
-const churchMemberFormSchema = z.object({
-  id: z.uuid(),
+const churchMemberBase = z.object({
   userId: z.string().uuid().nullable(),
   churchPositionId: z.string().uuid().nullable().optional(),
   churchFunctionId: z.string().uuid().nullable().optional(),
 
-  type: z.enum(["MEMBER", "VISITOR"]),
+  type: z.enum(["member", "visitor"]),
 
   photoUrl: nullableString,
   name: z.string().min(1, "Campo obrigatório"),
   birthDate: z.date().optional().nullable(),
-  gender: z.enum(["MALE", "FEMALE"]),
+  gender: z.enum(["male", "female"]),
   cpf: z
     .string()
     .trim()
@@ -60,26 +60,18 @@ const churchMemberFormSchema = z.object({
   city: nullableString,
   state: nullableString,
 
-  status: z.enum(["ACTIVE", "INACTIVE"]),
+  status: z.enum(["active", "inactive"]),
 });
 
-export const createChurchMemberSchema = churchMemberFormSchema.omit({
-  id: true,
+export const createChurchMemberSchema = churchMemberBase;
+export const updateChurchMemberSchema = churchMemberBase.extend({
+  id: z.uuid(),
 });
-export const updateChurchMemberSchema = churchMemberFormSchema;
-export const deleteChurchMemberSchema = churchMemberFormSchema.pick({
-  id: true,
+export const deleteChurchMemberSchema = z.object({
+  id: z.uuid(),
 });
 
-export type CreateChurchMemberInput = z.input<typeof createChurchMemberSchema>;
-export type CreateChurchMemberOutput = z.output<
-  typeof createChurchMemberSchema
->;
-
-export type UpdateChurchMemberInput = z.input<typeof updateChurchMemberSchema>;
-export type UpdateChurchMemberOutput = z.output<
-  typeof updateChurchMemberSchema
->;
-
-export type ChurchMemberFormSchema = z.output<typeof churchMemberFormSchema>;
+export type ChurchMember = typeof churchMember.$inferSelect;
+export type CreateChurchMemberSchema = z.input<typeof createChurchMemberSchema>;
+export type UpdateChurchMemberSchema = z.infer<typeof updateChurchMemberSchema>;
 export type DeleteChurchMemberSchema = z.infer<typeof deleteChurchMemberSchema>;

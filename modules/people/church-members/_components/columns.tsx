@@ -1,13 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ChurchMemberFormSchema } from "@/lib/validations/church-member";
-import { ChurchMemberActionCell } from "./church-member-action-cell";
+import { ChurchMember } from "../schemas";
+import { ChurchMemberActionCell } from "./actions-cell";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { format } from "date-fns";
 
-export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
+export const churchMemberColumns: ColumnDef<ChurchMember>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -47,7 +47,7 @@ export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
     ),
     cell: ({ row }) => {
       const type = row.original.type;
-      return type === "MEMBER" ? "Membro" : "Visitante";
+      return type === "member" ? "Membro" : "Visitante";
     },
   },
   {
@@ -75,7 +75,7 @@ export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
     ),
     cell: ({ row }) => {
       const status = row.original.status;
-      return status === "ACTIVE" ? "Ativo" : "Inativo";
+      return status === "active" ? "Ativo" : "Inativo";
     },
   },
   {
@@ -90,7 +90,10 @@ export const churchMemberColumns: ColumnDef<ChurchMemberFormSchema>[] = [
     cell: ({ row }) => {
       const churchMember = row.original;
       return (
-        <ChurchMemberActionCell id={churchMember.id} path="/people/members" />
+        <ChurchMemberActionCell
+          id={churchMember.id}
+          path={`/people/members/${churchMember.id}`}
+        />
       );
     },
   },
