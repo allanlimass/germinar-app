@@ -87,14 +87,11 @@ export const churchMemberColumns: ColumnDef<ChurchMember>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const churchMember = row.original;
-      return (
-        <ChurchMemberActionCell
-          id={churchMember.id}
-          path={`/people/members/${churchMember.id}`}
-        />
-      );
-    },
+    cell: ({ row }) => (
+      <ChurchMemberActionCell
+        id={row.original.id}
+        path={`/branch/${row.original.branchId}/people/members`}
+      />
+    ),
   },
 ];
