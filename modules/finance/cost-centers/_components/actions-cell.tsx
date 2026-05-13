@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, PencilIcon, TrashIcon } from "lucide-react";
-import { deleteCostCenter } from "@/actions/cost-center-actions";
+import { deleteCostCenter } from "../actions";
 
 interface CostCenterActionCellProps {
   id: string;

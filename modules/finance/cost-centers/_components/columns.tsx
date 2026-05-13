@@ -5,10 +5,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
-import { CostCenterActionCell } from "./cost-center-action-cell";
-import { CostCenterFormSchema } from "@/lib/validations/cost-center";
+import { CostCenterActionCell } from "./actions-cell";
+import { CostCenter } from "../schemas";
 
-export const costCenterColumns: ColumnDef<CostCenterFormSchema>[] = [
+export const costCenterColumns: ColumnDef<CostCenter>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -54,7 +54,10 @@ export const costCenterColumns: ColumnDef<CostCenterFormSchema>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <CostCenterActionCell path="/finance/cost-centers" id={row.original.id} />
+      <CostCenterActionCell
+        path={`/branch/${row.original.branchId}/finance/cost-centers`}
+        id={row.original.id}
+      />
     ),
   },
 ];

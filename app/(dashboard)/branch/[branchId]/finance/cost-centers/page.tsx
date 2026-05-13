@@ -1,13 +1,18 @@
 import { DataTable } from "@/components/data-table";
-import { listCostCenters } from "@/db/queries/cost-centers";
-import { costCenterColumns } from "./_components/cost-center-columns";
-import { getSessionContext } from "@/lib/utils/db-utils";
+import { getCostCenters } from "@/modules/finance/cost-centers/queries";
+import { costCenterColumns } from "@/modules/finance/cost-centers/_components/columns";
+import { getBranchContext } from "@/lib/utils/db-utils";
 import PageLayout from "@/components/layout/page-layout";
 import { PageLayoutActions } from "@/components/layout/page-layout-actions";
 
-export default async function ChurchFunctionsPage() {
-  const { organizationId } = await getSessionContext();
-  const costCenters = await listCostCenters(organizationId);
+export default async function CostCentersPage({
+  params,
+}: {
+  params: Promise<{ branchId: string }>;
+}) {
+  const { branchId } = await params;
+  const { organizationId } = await getBranchContext(branchId);
+  const costCenters = await getCostCenters(organizationId, branchId);
 
   return (
     <div>

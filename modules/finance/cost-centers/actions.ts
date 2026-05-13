@@ -1,35 +1,38 @@
 "use server";
 
-import { actionClient } from "@/lib/safe-action";
+import { branchActionClient } from "@/lib/safe-action";
 import {
   createCostCenterSchema,
   updateCostCenterSchema,
   deleteCostCenterSchema,
-} from "@/lib/validations/cost-center";
+} from "./schemas";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { financeCostCenter } from "@/db/schema/finance";
 import { and, eq } from "drizzle-orm";
 
-export const createCostCenter = actionClient
+const path = (branchId: string) => `/branch/${branchId}/finance/cost-centers`;
+
+export const createCostCenter = branchActionClient
   .inputSchema(createCostCenterSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
 
-    revalidatePath("/finance/cost-centers");
+    revalidatePath(path(branchId));
 
     await db.insert(financeCostCenter).values({
       organizationId,
+      branchId,
       ...parsedInput,
     });
   });
 
-export const updateCostCenter = actionClient
+export const updateCostCenter = branchActionClient
   .inputSchema(updateCostCenterSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
 
-    revalidatePath("/finance/cost-centers");
+    revalidatePath(path(branchId));
 
     await db
       .update(financeCostCenter)
@@ -38,16 +41,17 @@ export const updateCostCenter = actionClient
         and(
           eq(financeCostCenter.id, parsedInput.id),
           eq(financeCostCenter.organizationId, organizationId),
+          eq(financeCostCenter.branchId, branchId),
         ),
       );
   });
 
-export const deleteCostCenter = actionClient
+export const deleteCostCenter = branchActionClient
   .inputSchema(deleteCostCenterSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { organizationId } = ctx;
+    const { organizationId, branchId } = ctx;
 
-    revalidatePath("/finance/cost-centers");
+    revalidatePath(path(branchId));
 
     await db
       .delete(financeCostCenter)
@@ -55,6 +59,7 @@ export const deleteCostCenter = actionClient
         and(
           eq(financeCostCenter.id, parsedInput.id),
           eq(financeCostCenter.organizationId, organizationId),
+          eq(financeCostCenter.branchId, branchId),
         ),
       );
   });

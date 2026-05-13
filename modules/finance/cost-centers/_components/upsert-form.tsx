@@ -9,29 +9,28 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  CostCenterFormSchema,
+  CostCenter,
   CreateCostCenterSchema,
   createCostCenterSchema,
-} from "@/lib/validations/cost-center";
+} from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-  createCostCenter,
-  updateCostCenter,
-} from "@/actions/cost-center-actions";
+import { createCostCenter, updateCostCenter } from "../actions";
 import React from "react";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 
 interface UpsertCostCenterFormProps {
-  initialData?: CostCenterFormSchema;
+  initialData?: CostCenter;
+  branchId: string;
 }
 
 export function UpsertCostCenterForm({
   initialData,
+  branchId,
 }: UpsertCostCenterFormProps) {
   const router = useRouter();
 
@@ -53,7 +52,7 @@ export function UpsertCostCenterForm({
         form.reset();
         return;
       }
-      router.push("/finance/cost-centers");
+      router.push(`/branch/${branchId}/finance/cost-centers`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao criar centro de custo: " + error.serverError);
@@ -66,7 +65,7 @@ export function UpsertCostCenterForm({
       if (submitTypeRef.current === "continue") {
         return;
       }
-      router.push("/finance/cost-centers");
+      router.push(`/branch/${branchId}/finance/cost-centers`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao atualizar centro de custo: " + error.serverError);
