@@ -9,20 +9,17 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  ChartOfAccountFormSchema,
-  CreateChartOfAccountInput,
-  createChartOfAccountSchema,
-} from "@/lib/validations/chart-of-account";
+  ChartOfAccounts,
+  CreateChartOfAccountsSchema,
+  createChartOfAccountsSchema,
+} from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, SaveIcon, Loader2Icon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-  createChartOfAccount,
-  updateChartOfAccount,
-} from "@/actions/chart-of-account-actions";
+import { createChartOfAccount, updateChartOfAccount } from "../actions";
 import React from "react";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import {
@@ -34,24 +31,26 @@ import {
 } from "@/components/ui/select";
 
 interface UpsertChartOfAccountFormProps {
-  initialData?: ChartOfAccountFormSchema;
-  chartOfAccounts?: ChartOfAccountFormSchema[];
+  initialData?: ChartOfAccounts;
+  chartOfAccounts?: ChartOfAccounts[];
+  branchId: string;
 }
 
 export function UpsertChartOfAccountForm({
   initialData,
   chartOfAccounts,
+  branchId,
 }: UpsertChartOfAccountFormProps) {
   const router = useRouter();
 
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
-  const form = useForm<CreateChartOfAccountInput>({
-    resolver: zodResolver(createChartOfAccountSchema),
+  const form = useForm<CreateChartOfAccountsSchema>({
+    resolver: zodResolver(createChartOfAccountsSchema),
     defaultValues: {
       name: initialData?.name || "",
-      type: initialData?.type || "INCOME",
+      type: initialData?.type || "income",
       parentId: initialData?.parentId || null,
     },
   });
@@ -63,7 +62,7 @@ export function UpsertChartOfAccountForm({
         form.reset();
         return;
       }
-      router.push("/finance/chart-of-accounts");
+      router.push(`/branch/${branchId}/finance/chart-of-accounts`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao criar conta: " + error.serverError);
@@ -76,14 +75,14 @@ export function UpsertChartOfAccountForm({
       if (submitTypeRef.current === "continue") {
         return;
       }
-      router.push("/finance/chart-of-accounts");
+      router.push(`/branch/${branchId}/finance/chart-of-accounts`);
     },
     onError: ({ error }) => {
       toast.error("Erro ao atualizar conta: " + error.serverError);
     },
   });
 
-  const onSubmit = (data: CreateChartOfAccountInput) => {
+  const onSubmit = (data: CreateChartOfAccountsSchema) => {
     if (isEditing && initialData) {
       updateChartOfAccountAction.execute({ ...data, id: initialData.id });
     } else {
@@ -143,8 +142,8 @@ export function UpsertChartOfAccountForm({
                           <SelectValue placeholder="Selecione o tipo..." />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="INCOME">Receita</SelectItem>
-                          <SelectItem value="EXPENSE">Despesa</SelectItem>
+                          <SelectItem value="income">Receita</SelectItem>
+                          <SelectItem value="expense">Despesa</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -170,7 +169,7 @@ export function UpsertChartOfAccountForm({
 
                       const childrenMap = new Map<
                         string | null,
-                        ChartOfAccountFormSchema[]
+                        ChartOfAccounts[]
                       >();
                       for (const account of filtered) {
                         const key = account.parentId ?? null;

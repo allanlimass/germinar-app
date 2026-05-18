@@ -51,7 +51,7 @@ export const financeAccount = pgTable(
 
 export const financeChartOfAccountsType = pgEnum(
   "finance_chart_of_accounts_type",
-  ["EXPENSE", "INCOME"],
+  ["expense", "income"],
 );
 
 export const financeChartOfAccounts = pgTable(
@@ -124,7 +124,7 @@ export const financeSupplier = pgTable(
     phone: text("phone"),
     email: text("email"),
     zipCode: text("zip_code"),
-    address: text("address"),
+    street: text("street"),
     number: text("number"),
     complement: text("complement"),
     neighborhood: text("neighborhood"),

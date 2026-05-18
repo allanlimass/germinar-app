@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, PencilIcon, TrashIcon } from "lucide-react";
-import { deleteChartOfAccount } from "@/actions/chart-of-account-actions";
+import { deleteChartOfAccount } from "../actions";
 
 interface ChartOfAccountActionCellProps {
   id: string;

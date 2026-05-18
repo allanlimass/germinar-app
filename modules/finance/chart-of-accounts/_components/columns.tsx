@@ -4,14 +4,12 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import { listChartOfAccounts } from "@/db/queries/chart-of-accounts";
+import { getChartOfAccounts } from "../queries";
 import { format } from "date-fns";
-import { ChartOfAccountActionCell } from "./chart-of-account-action-cell";
+import { ChartOfAccountActionCell } from "./actions-cell";
 import { Badge } from "@/components/ui/badge";
 
-type ChartOfAccountRow = Awaited<
-  ReturnType<typeof listChartOfAccounts>
->[number];
+type ChartOfAccountRow = Awaited<ReturnType<typeof getChartOfAccounts>>[number];
 
 export const chartOfAccountColumns: ColumnDef<ChartOfAccountRow>[] = [
   {
@@ -50,7 +48,7 @@ export const chartOfAccountColumns: ColumnDef<ChartOfAccountRow>[] = [
     ),
     cell: ({ row }) => {
       const type = row.original.type;
-      return type === "INCOME" ? (
+      return type === "income" ? (
         <Badge className="border border-green-100 bg-green-100 text-green-600">
           Receita
         </Badge>

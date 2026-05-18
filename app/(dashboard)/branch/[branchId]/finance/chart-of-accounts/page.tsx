@@ -1,13 +1,19 @@
-import { getSessionContext } from "@/lib/utils/db-utils";
-import { listChartOfAccounts } from "@/db/queries/chart-of-accounts";
+import { getBranchContext } from "@/lib/utils/db-utils";
+import { getChartOfAccounts } from "@/modules/finance/chart-of-accounts/queries";
 import { DataTable } from "@/components/data-table";
-import { chartOfAccountColumns } from "./_components/chart-of-account-columns";
+import { chartOfAccountColumns } from "@/modules/finance/chart-of-accounts/_components/columns";
 import PageLayout from "@/components/layout/page-layout";
 import { PageLayoutActions } from "@/components/layout/page-layout-actions";
 
-export default async function ChartOfAccountsPage() {
-  const { organizationId } = await getSessionContext();
-  const chartOfAccounts = await listChartOfAccounts(organizationId);
+export default async function ChartOfAccountsPage({
+  params,
+}: {
+  params: Promise<{ branchId: string }>;
+}) {
+  const { branchId } = await params;
+  const { organizationId } = await getBranchContext(branchId);
+
+  const chartOfAccounts = await getChartOfAccounts(organizationId, branchId);
 
   return (
     <div>

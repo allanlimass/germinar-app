@@ -1,31 +1,36 @@
+import { getBranchContext } from "@/lib/utils/db-utils";
 import {
   getChartOfAccountById,
-  listChartOfAccounts,
-} from "@/db/queries/chart-of-accounts";
-import { UpsertChartOfAccountForm } from "../_components/upsert-chart-of-account-form";
+  getChartOfAccounts,
+} from "@/modules/finance/chart-of-accounts/queries";
+import { UpsertChartOfAccountForm } from "@/modules/finance/chart-of-accounts/_components/upsert-form";
 import { notFound } from "next/navigation";
-import { getSessionContext } from "@/lib/utils/db-utils";
 
 export default async function ChartOfAccountPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; branchId: string }>;
 }) {
-  const { id } = await params;
-  const chartOfAccount = await getChartOfAccountById(id);
+  const { id, branchId } = await params;
+  const { organizationId } = await getBranchContext(branchId);
+
+  const chartOfAccount = await getChartOfAccountById(
+    id,
+    organizationId,
+    branchId,
+  );
 
   if (!chartOfAccount) {
     notFound();
   }
 
-  const { organizationId } = await getSessionContext();
-
-  const chartOfAccounts = await listChartOfAccounts(organizationId);
+  const chartOfAccounts = await getChartOfAccounts(organizationId, branchId);
 
   return (
     <UpsertChartOfAccountForm
       initialData={chartOfAccount}
       chartOfAccounts={chartOfAccounts}
+      branchId={branchId}
     />
   );
 }
