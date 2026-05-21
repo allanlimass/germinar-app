@@ -117,7 +117,6 @@ export const financeSupplier = pgTable(
       .references(() => branch.id),
     isCompany: boolean("is_company").default(false).notNull(),
     name: text("name").notNull(),
-    companyName: text("company_name"),
     fantasyName: text("fantasy_name"),
     cpf: text("cpf").unique(),
     cnpj: text("cnpj").unique(),

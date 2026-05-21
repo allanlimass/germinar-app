@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { SupplierActionCell } from "./actions-cell";
 import { Supplier } from "../schemas";
+import { Badge } from "@/components/ui/badge";
 
 export const supplierColumns: ColumnDef<Supplier>[] = [
   {
@@ -39,10 +40,25 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
     cell: ({ row }) => <p className="font-medium">{row.original.name}</p>,
   },
   {
-    accessorKey: "companyName",
+    accessorKey: "isCompany",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Razão Social" />
+      <DataTableColumnHeader column={column} title="Tipo" />
     ),
+    cell: ({ row }) => <Badge>{row.original.isCompany ? "PJ" : "PF"}</Badge>,
+  },
+  {
+    id: "document",
+    accessorFn: (row) => (row.isCompany ? row.cnpj : row.cpf),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="CPF/CNPJ" />
+    ),
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Telefone" />
+    ),
+    cell: ({ row }) => <p>{row.original.phone}</p>,
   },
   {
     accessorKey: "createdAt",

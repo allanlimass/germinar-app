@@ -4,7 +4,6 @@ import { financeSupplier } from "@/db/schema/finance";
 const supplierBase = z.object({
   isCompany: z.boolean().default(false),
   name: z.string().min(1, "Campo obrigatório"),
-  companyName: z.string().optional(),
   fantasyName: z.string().optional(),
   cpf: z.string().optional(),
   cnpj: z.string().optional(),
