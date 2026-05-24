@@ -3,8 +3,14 @@ import { financeSupplier } from "@/db/schema/finance";
 
 const supplierBase = z.object({
   isCompany: z.boolean().default(false),
-  name: z.string().min(1, "Campo obrigatório"),
-  fantasyName: z.string().optional(),
+  name: z
+    .string()
+    .min(1, "Campo obrigatório")
+    .max(255, "Deve conter no máximo 255 caracteres"),
+  fantasyName: z
+    .string()
+    .max(255, "Deve conter no máximo 255 caracteres")
+    .optional(),
   cpf: z.string().optional(),
   cnpj: z.string().optional(),
   phone: z.string().optional(),
