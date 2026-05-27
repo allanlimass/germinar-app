@@ -40,7 +40,7 @@ export const accountColumns: ColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nome" />
     ),
-    cell: ({ row }) => <p>{row.original.name}</p>,
+    cell: ({ row }) => <p className="font-semibold">{row.original.name}</p>,
   },
   {
     accessorKey: "type",
@@ -68,7 +68,7 @@ export const accountColumns: ColumnDef<
   {
     accessorKey: "balance",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Saldo" />
+      <DataTableColumnHeader column={column} title="Saldo atual" />
     ),
     cell: ({ row }) => (
       <NumericFormat
