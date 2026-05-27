@@ -21,6 +21,12 @@ export const bank = pgTable("bank", {
   logoUrl: text("logo_url"),
 });
 
+export const accountType = pgEnum("account_type", [
+  "checking",
+  "savings",
+  "cash",
+]);
+
 export const financeAccount = pgTable(
   "finance_account",
   {
@@ -35,7 +41,7 @@ export const financeAccount = pgTable(
     name: text("name").notNull(),
     agency: text("agency"),
     account: text("account"),
-    type: text("type").notNull(),
+    type: accountType("type").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
