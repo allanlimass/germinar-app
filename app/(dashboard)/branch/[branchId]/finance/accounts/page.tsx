@@ -15,6 +15,8 @@ export default async function AccountsPage({
 
   const financeAccounts = await getFinanceAccounts(organizationId, branchId);
 
+  console.log(financeAccounts);
+
   return (
     <div>
       <PageLayout

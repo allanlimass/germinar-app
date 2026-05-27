@@ -42,9 +42,7 @@ export const getFinanceAccounts = async (
   const balanceSub = db
     .select({
       financeAccountId: financeTransaction.financeAccountId,
-      balance: sql<number>`COALESCE(SUM(CAST(amount AS NUMERIC)), 0)`.as(
-        "balance",
-      ),
+      balance: sql<number>`SUM(CAST(amount AS NUMERIC))`.as("balance"),
     })
     .from(financeTransaction)
     .where(eq(financeTransaction.status, "paid"))
@@ -55,7 +53,7 @@ export const getFinanceAccounts = async (
     .select({
       ...getTableColumns(financeAccount),
       bank: bank,
-      balance: balanceSub.balance,
+      balance: sql<number>`COALESCE(${balanceSub.balance}, 0)`,
     })
     .from(financeAccount)
     .where(
