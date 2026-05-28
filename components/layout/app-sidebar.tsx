@@ -26,7 +26,8 @@ import {
   Church,
   DollarSign,
   Megaphone,
-  ArrowDownUp,
+  ArrowUp,
+  ArrowDown,
   Landmark,
   Gauge,
   Group,
@@ -173,9 +174,15 @@ export function AppSidebar({
             isActive: false,
           },
           {
-            title: "Transações",
-            url: `/branch/${currentBranchId}/finance/transactions`,
-            icon: ArrowDownUp,
+            title: "Recebimentos",
+            url: `/branch/${currentBranchId}/finance/incomes`,
+            icon: ArrowDown,
+            isActive: false,
+          },
+          {
+            title: "Pagamentos",
+            url: `/branch/${currentBranchId}/finance/expenses`,
+            icon: ArrowUp,
             isActive: false,
           },
           {

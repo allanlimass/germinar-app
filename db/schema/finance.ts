@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
   uuid,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { churchMember } from "./people";
@@ -150,7 +151,6 @@ export const financeSupplier = pgTable(
 export const financeTransactionType = pgEnum("finance_transaction_type", [
   "income",
   "expense",
-  "transfer",
 ]);
 export const financeTransactionStatus = pgEnum("finance_transaction_status", [
   "pending",
@@ -177,9 +177,9 @@ export const financeTransaction = pgTable(
     financeAccountId: uuid("finance_account_id")
       .notNull()
       .references(() => financeAccount.id),
-    financeChartOfAccountId: uuid("finance_chart_of_account_id")
-      .notNull()
-      .references(() => financeChartOfAccounts.id),
+    financeChartOfAccountId: uuid("finance_chart_of_account_id").references(
+      () => financeChartOfAccounts.id,
+    ),
     financeCostCenterId: uuid("finance_cost_center_id").references(
       () => financeCostCenter.id,
     ),
@@ -244,6 +244,43 @@ export const financeTransactionAttachment = pgTable(
   ],
 );
 
+export const financeTransactionTransfer = pgTable(
+  "finance_transaction_transfer",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id),
+    branchId: uuid("branch_id")
+      .notNull()
+      .references(() => branch.id),
+    fromAccountId: uuid("from_account_id")
+      .notNull()
+      .references(() => financeAccount.id, { onDelete: "restrict" }),
+    toAccountId: uuid("to_account_id")
+      .notNull()
+      .references(() => financeAccount.id, { onDelete: "restrict" }),
+    amount: numeric("amount").notNull(),
+    description: text("description"),
+    date: timestamp("date").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("transaction_transfer_organizationId_idx").on(table.organizationId),
+    index("transaction_transfer_branchId_idx").on(table.branchId),
+    index("transaction_transfer_fromAccountId_idx").on(table.fromAccountId),
+    index("transaction_transfer_toAccountId_idx").on(table.toAccountId),
+    index("transaction_transfer_createdBy_idx").on(table.createdBy),
+  ],
+);
+
 export const financeTransactionRelations = relations(
   financeTransaction,
   ({ one, many }) => ({
@@ -299,6 +336,12 @@ export const financeAccountRelations = relations(
       references: [bank.id],
     }),
     transactions: many(financeTransaction),
+    transfersFrom: many(financeTransactionTransfer, {
+      relationName: "from_account",
+    }),
+    transfersTo: many(financeTransactionTransfer, {
+      relationName: "to_account",
+    }),
   }),
 );
 
@@ -358,6 +401,32 @@ export const financeTransactionAttachmentRelations = relations(
     financeTransaction: one(financeTransaction, {
       fields: [financeTransactionAttachment.financeTransactionId],
       references: [financeTransaction.id],
+    }),
+  }),
+);
+
+export const financeTransactionTransferRelations = relations(
+  financeTransactionTransfer,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [financeTransactionTransfer.organizationId],
+      references: [organization.id],
+    }),
+    branch: one(branch, {
+      fields: [financeTransactionTransfer.branchId],
+      references: [branch.id],
+    }),
+    fromAccount: one(financeAccount, {
+      fields: [financeTransactionTransfer.fromAccountId],
+      references: [financeAccount.id],
+    }),
+    toAccount: one(financeAccount, {
+      fields: [financeTransactionTransfer.toAccountId],
+      references: [financeAccount.id],
+    }),
+    createdBy: one(user, {
+      fields: [financeTransactionTransfer.createdBy],
+      references: [user.id],
     }),
   }),
 );
