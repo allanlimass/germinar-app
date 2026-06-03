@@ -9,7 +9,6 @@ import {
   text,
   timestamp,
   uuid,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
 import { churchMember } from "./people";
@@ -156,12 +155,22 @@ export const financeTransactionStatus = pgEnum("finance_transaction_status", [
   "pending",
   "paid",
   "overdue",
-  "canceled",
 ]);
 export const financeTransactionSource = pgEnum("finance_transaction_source", [
   "manual",
   "import",
   "gateway",
+]);
+
+export const financePaymentMethod = pgEnum("finance_payment_method", [
+  "credit_card",
+  "debit_card",
+  "cash",
+  "check",
+  "bank_slip",
+  "pix",
+  "transfer",
+  "other",
 ]);
 
 export const financeTransaction = pgTable(
@@ -194,9 +203,8 @@ export const financeTransaction = pgTable(
     description: text("description"),
     dueDate: timestamp("due_date"),
     paymentDate: timestamp("payment_date"),
+    paymentMethod: financePaymentMethod("payment_method"),
     status: financeTransactionStatus("status").notNull().default("pending"),
-    source: financeTransactionSource("source").notNull().default("manual"),
-    externalId: text("external_id"),
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),

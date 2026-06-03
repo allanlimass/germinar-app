@@ -2,31 +2,19 @@
 
 import { branchActionClient } from "@/lib/safe-action";
 import {
-  createTransactionSchema,
-  deleteTransactionSchema,
-  updateTransactionSchema,
+  createIncomeSchema,
+  deleteIncomeSchema,
+  updateIncomeSchema,
 } from "./schemas";
 import { db } from "@/db";
 import { financeTransaction } from "@/db/schema/finance";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export const createTransaction = branchActionClient
-  .inputSchema(createTransactionSchema)
-  .action(async ({ parsedInput, ctx }) => {
-    const { organizationId, branchId } = ctx;
+const path = (branchId: string) => `/branch/${branchId}/finance/incomes`;
 
-    await db.insert(financeTransaction).values({
-      organizationId,
-      ...parsedInput,
-      branchId,
-    });
-
-    revalidatePath(`/finance`);
-  });
-
-export const updateTransaction = branchActionClient
-  .inputSchema(updateTransactionSchema)
+export const createIncome = branchActionClient
+  .inputSchema(createIncomeSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId, branchId } = ctx;
 
@@ -34,11 +22,29 @@ export const updateTransaction = branchActionClient
       ...parsedInput,
       organizationId,
       branchId,
+      createdBy: ctx.session.user.id,
     });
+
+    revalidatePath(path(branchId));
   });
 
-export const deleteTransaction = branchActionClient
-  .inputSchema(deleteTransactionSchema)
+export const updateIncome = branchActionClient
+  .inputSchema(updateIncomeSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { organizationId, branchId } = ctx;
+
+    await db.insert(financeTransaction).values({
+      ...parsedInput,
+      organizationId,
+      branchId,
+      createdBy: ctx.session.user.id,
+    });
+
+    revalidatePath(path(branchId));
+  });
+
+export const deleteIncome = branchActionClient
+  .inputSchema(deleteIncomeSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { organizationId, branchId } = ctx;
 
@@ -51,4 +57,6 @@ export const deleteTransaction = branchActionClient
           eq(financeTransaction.branchId, branchId),
         ),
       );
+
+    revalidatePath(path(branchId));
   });
