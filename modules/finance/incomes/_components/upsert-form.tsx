@@ -14,6 +14,8 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxTrigger,
+  ComboboxValue,
 } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -32,7 +34,7 @@ import { createIncome, updateIncome } from "../actions";
 import React from "react";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDown, CalendarIcon, UploadIcon } from "lucide-react";
+import { ArrowDown, CalendarIcon, ChevronDown, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import { NumericFormat } from "react-number-format";
@@ -148,12 +150,12 @@ export function UpsertIncomeForm({
           toast.error("Por favor, verifique os campos do formulário.");
         })}
       >
-        <Card>
+        <Card className="rounded-md">
           <CardHeader>
             <CardTitle>Informações Básicas</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <FieldGroup>
+          <CardContent>
+            <FieldGroup className="gap-5">
               <div className="grid gap-4 md:grid-cols-4">
                 <Controller
                   name="dueDate"
@@ -168,11 +170,11 @@ export function UpsertIncomeForm({
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[280px] justify-start text-left font-normal",
+                              "w-full justify-start text-left font-normal",
                               !field.value && "text-muted-foreground",
                             )}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            <CalendarIcon className="text-muted-foreground h-4 w-4" />
                             {field.value ? (
                               format(field.value, "dd/MM/yyyy")
                             ) : (
@@ -224,27 +226,32 @@ export function UpsertIncomeForm({
                   render={({ field, fieldState }) => (
                     <Field>
                       <FieldLabel htmlFor={field.name}>Valor</FieldLabel>
-                      <NumericFormat
-                        id={field.name}
-                        getInputRef={field.ref}
-                        name={field.name}
-                        onBlur={field.onBlur}
-                        value={field.value ?? ""}
-                        placeholder="0,00"
-                        thousandSeparator="."
-                        decimalSeparator=","
-                        prefix="R$ "
-                        decimalScale={2}
-                        fixedDecimalScale
-                        allowNegative={false}
-                        onValueChange={(value) =>
-                          field.onChange(value.floatValue ?? 0)
-                        }
-                        customInput={Input}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      <div className="relative">
+                        <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+                          R$
+                        </span>
+                        <NumericFormat
+                          id={field.name}
+                          getInputRef={field.ref}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          value={field.value ?? ""}
+                          placeholder="0,00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative={false}
+                          onValueChange={(value) =>
+                            field.onChange(value.floatValue ?? 0)
+                          }
+                          customInput={Input}
+                          className="pl-8"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </div>
                     </Field>
                   )}
                 />
@@ -254,107 +261,193 @@ export function UpsertIncomeForm({
                 <Controller
                   name="financeContributorId"
                   control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="md:col-span-2">
-                      <FieldLabel htmlFor={field.name}>Recebido de</FieldLabel>
-                      <Combobox
-                        items={contributors}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <ComboboxInput placeholder="Selecione" />
-                        <ComboboxContent>
-                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
-                          <ComboboxList>
-                            {(item) => (
-                              <ComboboxItem key={item.id} value={item.name}>
-                                {item.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
+                  render={({ field, fieldState }) => {
+                    const items =
+                      contributors?.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                      })) ?? [];
+
+                    return (
+                      <Field className="md:col-span-2">
+                        <FieldLabel htmlFor={field.name}>
+                          Recebido de
+                        </FieldLabel>
+                        <Combobox
+                          items={items}
+                          value={
+                            items.find((i) => i.value === field.value) ?? null
+                          }
+                          onValueChange={(item) =>
+                            field.onChange(item?.value ?? "")
+                          }
+                        >
+                          <ComboboxTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                className="relative w-full justify-between font-normal"
+                              >
+                                <ComboboxValue placeholder="Selecione" />
+                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                          <ComboboxContent>
+                            <ComboboxInput
+                              showTrigger={false}
+                              placeholder="Pesquisar..."
+                            />
+                            <ComboboxEmpty>
+                              Nenhum item encontrado
+                            </ComboboxEmpty>
+                            <ComboboxList>
+                              {(item) => (
+                                <ComboboxItem key={item.value} value={item}>
+                                  {item.label}
+                                </ComboboxItem>
+                              )}
+                            </ComboboxList>
+                          </ComboboxContent>
+                        </Combobox>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    );
+                  }}
                 />
 
                 <Controller
                   name="financeChartOfAccountId"
                   control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Plano de Conta
-                      </FieldLabel>
-                      <Combobox
-                        items={chartOfAccounts}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <ComboboxInput placeholder="Selecione" />
-                        <ComboboxContent>
-                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
-                          <ComboboxList>
-                            {(item) => (
-                              <ComboboxItem key={item.id} value={item.name}>
-                                {item.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
+                  render={({ field, fieldState }) => {
+                    const items =
+                      chartOfAccounts?.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                      })) ?? [];
+
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>
+                          Plano de Conta
+                        </FieldLabel>
+                        <Combobox
+                          items={items}
+                          value={
+                            items.find((i) => i.value === field.value) ?? null
+                          }
+                          onValueChange={(item) =>
+                            field.onChange(item?.value ?? "")
+                          }
+                        >
+                          <ComboboxTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                className="relative w-full justify-between font-normal"
+                              >
+                                <ComboboxValue />
+                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                          <ComboboxContent>
+                            <ComboboxInput
+                              showTrigger={false}
+                              placeholder="Buscar"
+                            />
+                            <ComboboxEmpty>
+                              Nenhum item encontrado
+                            </ComboboxEmpty>
+                            <ComboboxList>
+                              {(item) => (
+                                <ComboboxItem key={item.value} value={item}>
+                                  {item.label}
+                                </ComboboxItem>
+                              )}
+                            </ComboboxList>
+                          </ComboboxContent>
+                        </Combobox>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    );
+                  }}
                 />
 
                 <Controller
                   name="financeCostCenterId"
                   control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Centro de Custo
-                      </FieldLabel>
-                      <Combobox
-                        items={costCenters}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <ComboboxInput placeholder="Selecione" />
-                        <ComboboxContent>
-                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
-                          <ComboboxList>
-                            {(item) => (
-                              <ComboboxItem key={item.id} value={item}>
-                                {item.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
+                  render={({ field, fieldState }) => {
+                    const items =
+                      costCenters?.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                      })) ?? [];
+
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>
+                          Centro de Custo
+                        </FieldLabel>
+                        <Combobox
+                          items={items}
+                          value={
+                            items.find((i) => i.value === field.value) ?? null
+                          }
+                          onValueChange={(item) =>
+                            field.onChange(item?.value ?? "")
+                          }
+                        >
+                          <ComboboxTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                className="relative w-full justify-between font-normal"
+                              >
+                                <ComboboxValue />
+                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                          <ComboboxContent>
+                            <ComboboxInput
+                              showTrigger={false}
+                              placeholder="Buscar"
+                            />
+                            <ComboboxEmpty>
+                              Nenhum item encontrado
+                            </ComboboxEmpty>
+                            <ComboboxList>
+                              {(item) => (
+                                <ComboboxItem key={item.value} value={item}>
+                                  {item.label}
+                                </ComboboxItem>
+                              )}
+                            </ComboboxList>
+                          </ComboboxContent>
+                        </Combobox>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    );
+                  }}
                 />
               </div>
             </FieldGroup>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-md">
           <CardHeader>
             <CardTitle>Informações do Recebimento</CardTitle>
           </CardHeader>
           <CardContent>
-            <FieldGroup>
+            <FieldGroup className="gap-5">
               <div className="grid gap-4">
                 <Controller
                   name="status"
@@ -393,11 +486,11 @@ export function UpsertIncomeForm({
                             variant={"outline"}
                             disabled={isPaid !== "paid"}
                             className={cn(
-                              "w-[280px] justify-start text-left font-normal",
+                              "w-full justify-start text-left font-normal",
                               !field.value && "text-muted-foreground",
                             )}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            <CalendarIcon className="text-muted-foreground h-4 w-4" />
                             {field.value ? (
                               format(field.value, "dd/MM/yyyy")
                             ) : (
@@ -467,250 +560,6 @@ export function UpsertIncomeForm({
                   render={({ field, fieldState }) => (
                     <Field>
                       <FieldLabel htmlFor={field.name}>Conta</FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </div>
-              <div className="grid gap-4">
-                {/* Upload Area */}
-                <div
-                  className={cn(
-                    "border-muted-foreground/25 hover:border-muted-foreground/50 relative rounded-lg border-dashed p-8 text-center transition-colors",
-                  )}
-                >
-                  <div className="flex flex-col items-center gap-4">
-                    <div
-                      className={cn(
-                        "bg-muted flex h-16 w-16 items-center justify-center rounded-full",
-                      )}
-                    >
-                      <UploadIcon
-                        className={cn(
-                          "h-6",
-                          isPaid !== "paid"
-                            ? "text-muted-foreground"
-                            : "text-primary",
-                        )}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </FieldGroup>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Adicionais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FieldGroup>
-              <div className="grid gap-4">
-                <Controller
-                  name="financeChartOfAccountId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Conta Contábil
-                      </FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="financeCostCenterId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Centro de Custo
-                      </FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </div>
-            </FieldGroup>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Adicionais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FieldGroup>
-              <div className="grid gap-4">
-                <Controller
-                  name="financeChartOfAccountId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Conta Contábil
-                      </FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="financeCostCenterId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Centro de Custo
-                      </FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </div>
-            </FieldGroup>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Adicionais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FieldGroup>
-              <div className="grid gap-4">
-                <Controller
-                  name="financeChartOfAccountId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Conta Contábil
-                      </FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="financeCostCenterId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Centro de Custo
-                      </FieldLabel>
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}

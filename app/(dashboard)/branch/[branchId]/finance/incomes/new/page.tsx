@@ -13,12 +13,12 @@ export default async function NewIncomePage({
   const { branchId } = await params;
   const { organizationId } = await getBranchContext(branchId);
 
-  const [contributors, accounts, chartOfAccounts, costCenters] =
+  const [contributors, chartOfAccounts, costCenters, accounts] =
     await Promise.all([
       getChurchMembers(organizationId, branchId),
-      getAccounts(organizationId, branchId),
       getChartOfAccounts(organizationId, branchId),
       getCostCenters(organizationId, branchId),
+      getAccounts(organizationId, branchId),
     ]);
 
   return (
