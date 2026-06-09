@@ -204,6 +204,11 @@ export const financeTransaction = pgTable(
     dueDate: timestamp("due_date"),
     paymentDate: timestamp("payment_date"),
     paymentMethod: financePaymentMethod("payment_method"),
+    recurrenceGroupId: uuid("recurrence_group_id"),
+    recurrenceIndex: integer("recurrence_index"),
+    fines: numeric("fines"),
+    fees: numeric("fees"),
+    paidAmount: numeric("paid_amount"),
     status: financeTransactionStatus("status").notNull().default("pending"),
     createdBy: text("created_by")
       .notNull()

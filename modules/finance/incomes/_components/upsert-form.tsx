@@ -6,6 +6,9 @@ import {
   Field,
   FieldLabel,
   FieldError,
+  FieldTitle,
+  FieldDescription,
+  FieldContent,
 } from "@/components/ui/field";
 import {
   Combobox,
@@ -14,8 +17,6 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxTrigger,
-  ComboboxValue,
 } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -34,10 +35,17 @@ import { createIncome, updateIncome } from "../actions";
 import React from "react";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDown, CalendarIcon, ChevronDown, SearchIcon } from "lucide-react";
+import { ArrowDown, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import { NumericFormat } from "react-number-format";
+import { ChurchMember as Contributor } from "@/modules/people/church-members/schemas";
+import { ChartOfAccounts } from "@/modules/finance/chart-of-accounts/schemas";
+import { CostCenter } from "@/modules/finance/cost-centers/schemas";
+import { Account } from "@/modules/finance/accounts/schemas";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -45,11 +53,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChurchMember as Contributor } from "@/modules/people/church-members/schemas";
-import { ChartOfAccounts } from "@/modules/finance/chart-of-accounts/schemas";
-import { CostCenter } from "@/modules/finance/cost-centers/schemas";
-import { Account } from "@/modules/finance/accounts/schemas";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 interface UpsertIncomeFormProps {
   initialData?: Income;
@@ -73,6 +82,17 @@ export function UpsertIncomeForm({
   const submitTypeRef = React.useRef<"default" | "continue">("default");
   const isEditing = !!initialData;
 
+  const paymentMethods = [
+    { value: "cash", label: "Dinheiro" },
+    { value: "pix", label: "PIX" },
+    { value: "credit_card", label: "Cartão de Crédito" },
+    { value: "debit_card", label: "Cartão de Crédito" },
+    { value: "check", label: "Cheque" },
+    { value: "bank_slip", label: "Boleto" },
+    { value: "transfer", label: "Transferência" },
+    { value: "other", label: "Outro" },
+  ];
+
   const form = useForm<CreateIncomeSchema>({
     resolver: zodResolver(createIncomeSchema),
     defaultValues: {
@@ -86,7 +106,18 @@ export function UpsertIncomeForm({
       description: initialData?.description || "",
       dueDate: initialData?.dueDate || new Date(),
       paymentDate: initialData?.paymentDate || new Date(),
-      paymentMethod: initialData?.paymentMethod || "pix",
+      paymentMethod: initialData?.paymentMethod || null,
+      fines: Number(initialData?.fines) || 0,
+      fees: Number(initialData?.fees) || 0,
+      paidAmount: Number(initialData?.paidAmount) || 0,
+      periodicity: initialData?.periodicity || "unique",
+      periodicityRecurrenceFrequency:
+        initialData?.periodicityRecurrenceFrequency || "",
+      periodicityParcelledQuantity:
+        initialData?.periodicityParcelledQuantity || 0,
+      periodicityParcelledPeriod: initialData?.periodicityParcelledPeriod || "",
+      periodicityParcelledSplit:
+        initialData?.periodicityParcelledSplit || false,
       status: initialData?.status || "pending",
     },
   });
@@ -94,6 +125,10 @@ export function UpsertIncomeForm({
   const isPaid = useWatch({
     control: form.control,
     name: "status",
+  });
+  const isPeriodic = useWatch({
+    control: form.control,
+    name: "periodicity",
   });
 
   const createChurchFunctionAction = useAction(createIncome, {
@@ -141,8 +176,13 @@ export function UpsertIncomeForm({
         }
         icon={<ArrowDown />}
         saveAction={form.handleSubmit(onSubmit)}
+        saveAndContinueAction={() => {
+          submitTypeRef.current = "continue";
+          onSubmit(form.getValues());
+        }}
         cancelAction={() => router.push(`/branch/${branchId}/finance/incomes`)}
       />
+
       <form
         className="flex h-full flex-col gap-6"
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
@@ -154,6 +194,7 @@ export function UpsertIncomeForm({
           <CardHeader>
             <CardTitle>Informações Básicas</CardTitle>
           </CardHeader>
+          <Separator />
           <CardContent>
             <FieldGroup className="gap-5">
               <div className="grid gap-4 md:grid-cols-4">
@@ -225,11 +266,13 @@ export function UpsertIncomeForm({
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>Valor</FieldLabel>
-                      <div className="relative">
-                        <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                          R$
-                        </span>
+                      <FieldLabel htmlFor={field.name}>
+                        Valor<span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>R$</InputGroupText>
+                        </InputGroupAddon>
                         <NumericFormat
                           id={field.name}
                           getInputRef={field.ref}
@@ -245,13 +288,13 @@ export function UpsertIncomeForm({
                           onValueChange={(value) =>
                             field.onChange(value.floatValue ?? 0)
                           }
-                          customInput={Input}
-                          className="pl-8"
+                          customInput={InputGroupInput}
+                          required
                         />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </div>
+                      </InputGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -261,181 +304,104 @@ export function UpsertIncomeForm({
                 <Controller
                   name="financeContributorId"
                   control={form.control}
-                  render={({ field, fieldState }) => {
-                    const items =
-                      contributors?.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })) ?? [];
-
-                    return (
-                      <Field className="md:col-span-2">
-                        <FieldLabel htmlFor={field.name}>
-                          Recebido de
-                        </FieldLabel>
-                        <Combobox
-                          items={items}
-                          value={
-                            items.find((i) => i.value === field.value) ?? null
-                          }
-                          onValueChange={(item) =>
-                            field.onChange(item?.value ?? "")
-                          }
-                        >
-                          <ComboboxTrigger
-                            render={
-                              <Button
-                                variant="outline"
-                                className="relative w-full justify-between font-normal"
-                              >
-                                <ComboboxValue placeholder="Selecione" />
-                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                          <ComboboxContent>
-                            <ComboboxInput
-                              showTrigger={false}
-                              placeholder="Pesquisar..."
-                            />
-                            <ComboboxEmpty>
-                              Nenhum item encontrado
-                            </ComboboxEmpty>
-                            <ComboboxList>
-                              {(item) => (
-                                <ComboboxItem key={item.value} value={item}>
-                                  {item.label}
-                                </ComboboxItem>
-                              )}
-                            </ComboboxList>
-                          </ComboboxContent>
-                        </Combobox>
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    );
-                  }}
+                  render={({ field, fieldState }) => (
+                    <Field className="col-span-2">
+                      <FieldLabel htmlFor={field.name}>Contribuinte</FieldLabel>
+                      <Combobox
+                        items={contributors?.map((account) => ({
+                          value: account.id,
+                          label: account.name,
+                        }))}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <ComboboxInput placeholder="Selecione" />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => (
+                              <ComboboxItem key={item.value} value={item}>
+                                {item.label}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
 
                 <Controller
                   name="financeChartOfAccountId"
                   control={form.control}
-                  render={({ field, fieldState }) => {
-                    const items =
-                      chartOfAccounts?.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })) ?? [];
-
-                    return (
-                      <Field>
-                        <FieldLabel htmlFor={field.name}>
-                          Plano de Conta
-                        </FieldLabel>
-                        <Combobox
-                          items={items}
-                          value={
-                            items.find((i) => i.value === field.value) ?? null
-                          }
-                          onValueChange={(item) =>
-                            field.onChange(item?.value ?? "")
-                          }
-                        >
-                          <ComboboxTrigger
-                            render={
-                              <Button
-                                variant="outline"
-                                className="relative w-full justify-between font-normal"
-                              >
-                                <ComboboxValue />
-                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                          <ComboboxContent>
-                            <ComboboxInput
-                              showTrigger={false}
-                              placeholder="Buscar"
-                            />
-                            <ComboboxEmpty>
-                              Nenhum item encontrado
-                            </ComboboxEmpty>
-                            <ComboboxList>
-                              {(item) => (
-                                <ComboboxItem key={item.value} value={item}>
-                                  {item.label}
-                                </ComboboxItem>
-                              )}
-                            </ComboboxList>
-                          </ComboboxContent>
-                        </Combobox>
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    );
-                  }}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Plano de Conta
+                      </FieldLabel>
+                      <Combobox
+                        items={chartOfAccounts?.map((account) => ({
+                          value: account.id,
+                          label: account.name,
+                        }))}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <ComboboxInput placeholder="Selecione" />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => (
+                              <ComboboxItem key={item.value} value={item}>
+                                {item.label}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
 
                 <Controller
                   name="financeCostCenterId"
                   control={form.control}
-                  render={({ field, fieldState }) => {
-                    const items =
-                      costCenters?.map((item) => ({
-                        value: item.id,
-                        label: item.name,
-                      })) ?? [];
-
-                    return (
-                      <Field>
-                        <FieldLabel htmlFor={field.name}>
-                          Centro de Custo
-                        </FieldLabel>
-                        <Combobox
-                          items={items}
-                          value={
-                            items.find((i) => i.value === field.value) ?? null
-                          }
-                          onValueChange={(item) =>
-                            field.onChange(item?.value ?? "")
-                          }
-                        >
-                          <ComboboxTrigger
-                            render={
-                              <Button
-                                variant="outline"
-                                className="relative w-full justify-between font-normal"
-                              >
-                                <ComboboxValue />
-                                <ChevronDown className="text-muted-foreground absolute right-2 h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                          <ComboboxContent>
-                            <ComboboxInput
-                              showTrigger={false}
-                              placeholder="Buscar"
-                            />
-                            <ComboboxEmpty>
-                              Nenhum item encontrado
-                            </ComboboxEmpty>
-                            <ComboboxList>
-                              {(item) => (
-                                <ComboboxItem key={item.value} value={item}>
-                                  {item.label}
-                                </ComboboxItem>
-                              )}
-                            </ComboboxList>
-                          </ComboboxContent>
-                        </Combobox>
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    );
-                  }}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Centro de Custo
+                      </FieldLabel>
+                      <Combobox
+                        items={costCenters?.map((account) => ({
+                          value: account.id,
+                          label: account.name,
+                        }))}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <ComboboxInput placeholder="Selecione" />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => (
+                              <ComboboxItem key={item.value} value={item}>
+                                {item.label}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
             </FieldGroup>
@@ -444,8 +410,9 @@ export function UpsertIncomeForm({
 
         <Card className="rounded-md">
           <CardHeader>
-            <CardTitle>Informações do Recebimento</CardTitle>
+            <CardTitle>Dados do Recebimento</CardTitle>
           </CardHeader>
+          <Separator />
           <CardContent>
             <FieldGroup className="gap-5">
               <div className="grid gap-4">
@@ -522,31 +489,26 @@ export function UpsertIncomeForm({
                       <FieldLabel htmlFor={field.name}>
                         Método de Pagamento
                       </FieldLabel>
-                      <Select
+                      <Combobox
+                        items={paymentMethods}
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cash">Dinheiro</SelectItem>
-                          <SelectItem value="credit_card">
-                            Cartão de Crédito
-                          </SelectItem>
-                          <SelectItem value="debit_card">
-                            Cartão de Débito
-                          </SelectItem>
-                          <SelectItem value="check">Cheque</SelectItem>
-                          <SelectItem value="bank_slip">Boleto</SelectItem>
-                          <SelectItem value="pix">Pix</SelectItem>
-                          <SelectItem value="transfer">
-                            Transferência
-                          </SelectItem>
-                          <SelectItem value="other">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <ComboboxInput
+                          disabled={isPaid !== "paid"}
+                          placeholder="Selecione"
+                        />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => (
+                              <ComboboxItem key={item.value} value={item}>
+                                {item.label}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                       )}
@@ -560,22 +522,29 @@ export function UpsertIncomeForm({
                   render={({ field, fieldState }) => (
                     <Field>
                       <FieldLabel htmlFor={field.name}>Conta</FieldLabel>
-                      <Select
+                      <Combobox
+                        items={accounts?.map((account) => ({
+                          value: account.id,
+                          label: account.name,
+                        }))}
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={isPaid !== "paid"}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <ComboboxInput
+                          disabled={isPaid !== "paid"}
+                          placeholder="Selecione"
+                        />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Nenhum item encontrado</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => (
+                              <ComboboxItem key={item.value} value={item}>
+                                {item.label}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                       )}
@@ -583,6 +552,333 @@ export function UpsertIncomeForm({
                   )}
                 />
               </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <Controller
+                  name="fines"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Juros/Multa</FieldLabel>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>R$</InputGroupText>
+                        </InputGroupAddon>
+                        <NumericFormat
+                          id={field.name}
+                          getInputRef={field.ref}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          value={field.value ?? ""}
+                          placeholder="0,00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative={false}
+                          onValueChange={(value) =>
+                            field.onChange(value.floatValue ?? 0)
+                          }
+                          customInput={InputGroupInput}
+                          disabled={isPaid !== "paid"}
+                          required
+                        />
+                      </InputGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                <Controller
+                  name="fees"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Taxas</FieldLabel>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>R$</InputGroupText>
+                        </InputGroupAddon>
+                        <NumericFormat
+                          id={field.name}
+                          getInputRef={field.ref}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          value={field.value ?? ""}
+                          placeholder="0,00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative={false}
+                          onValueChange={(value) =>
+                            field.onChange(value.floatValue ?? 0)
+                          }
+                          customInput={InputGroupInput}
+                          disabled={isPaid !== "paid"}
+                          required
+                        />
+                      </InputGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                <Controller
+                  name="paidAmount"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Valor Recebido
+                      </FieldLabel>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>R$</InputGroupText>
+                        </InputGroupAddon>
+                        <NumericFormat
+                          id={field.name}
+                          getInputRef={field.ref}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          value={field.value ?? ""}
+                          placeholder="0,00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative={false}
+                          onValueChange={(value) =>
+                            field.onChange(value.floatValue ?? 0)
+                          }
+                          customInput={InputGroupInput}
+                          disabled={isPaid !== "paid"}
+                          readOnly
+                          required
+                        />
+                      </InputGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
+
+              <div>
+                <Controller
+                  name="financeAttachmentId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Anexo</FieldLabel>
+                      <Input
+                        type="file"
+                        id={field.name}
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.files?.[0])}
+                        disabled={isPaid !== "paid"}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-md">
+          <CardHeader>
+            <CardTitle>Dados de Recorrência</CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent>
+            <FieldGroup>
+              <div>
+                <Controller
+                  name="periodicity"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <RadioGroup
+                        defaultValue="unique"
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        className="flex w-full"
+                      >
+                        <FieldLabel htmlFor={field.name}>
+                          <Field orientation="horizontal">
+                            <FieldContent>
+                              <FieldTitle>Único</FieldTitle>
+                              <FieldDescription>
+                                Este lançamento ocorrerá apenas uma vez
+                              </FieldDescription>
+                            </FieldContent>
+                            <RadioGroupItem value="unique" id="unique" />
+                          </Field>
+                        </FieldLabel>
+
+                        <FieldLabel htmlFor={field.name}>
+                          <Field orientation="horizontal">
+                            <FieldContent>
+                              <FieldTitle>Recorrente</FieldTitle>
+                              <FieldDescription>
+                                Este lançamento ocorrerá em intervalos regulares
+                              </FieldDescription>
+                            </FieldContent>
+                            <RadioGroupItem value="recorrent" id="recorrent" />
+                          </Field>
+                        </FieldLabel>
+
+                        <FieldLabel htmlFor={field.name}>
+                          <Field orientation="horizontal">
+                            <FieldContent>
+                              <FieldTitle>Parcelado</FieldTitle>
+                              <FieldDescription>
+                                Este lançamento ocorrerá em parcelas
+                              </FieldDescription>
+                            </FieldContent>
+                            <RadioGroupItem value="parcelled" id="parcelled" />
+                          </Field>
+                        </FieldLabel>
+                      </RadioGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
+
+              {isPeriodic === "recorrent" && (
+                <div>
+                  <Controller
+                    name="periodicityRecurrenceFrequency"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-2">
+                        <FieldLabel htmlFor={field.name}>Período</FieldLabel>
+                        <RadioGroup
+                          defaultValue="monthly"
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          className="flex w-full"
+                        >
+                          <Field orientation="horizontal" className="gap-2">
+                            <RadioGroupItem value="daily" id="daily" />
+                            <FieldLabel htmlFor="daily">Diário</FieldLabel>
+                          </Field>
+                          <Field orientation="horizontal" className="gap-2">
+                            <RadioGroupItem value="weekly" id="weekly" />
+                            <FieldLabel htmlFor="weekly">Semanal</FieldLabel>
+                          </Field>
+                          <Field orientation="horizontal" className="gap-2">
+                            <RadioGroupItem value="monthly" id="monthly" />
+                            <FieldLabel htmlFor="monthly">Mensal</FieldLabel>
+                          </Field>
+                          <Field orientation="horizontal" className="gap-2">
+                            <RadioGroupItem value="yearly" id="yearly" />
+                            <FieldLabel htmlFor="yearly">Anual</FieldLabel>
+                          </Field>
+                        </RadioGroup>
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </div>
+              )}
+
+              {isPeriodic === "parcelled" && (
+                <div className="grid items-end gap-4 md:grid-cols-3">
+                  <Controller
+                    name="periodicityParcelledQuantity"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-2">
+                        <FieldLabel htmlFor={field.name}>Quantidade</FieldLabel>
+                        <InputGroup>
+                          <InputGroupInput
+                            id={field.name}
+                            type="number"
+                            min={2}
+                            className="w-full"
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          />
+                          <InputGroupAddon align="inline-end">
+                            {field.value}x de R${" "}
+                            {form.watch("amount") / field.value}
+                          </InputGroupAddon>
+                        </InputGroup>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="periodicityParcelledPeriod"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-2">
+                        <FieldLabel htmlFor={field.name}>
+                          Periodicidade
+                        </FieldLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          defaultValue="monthly"
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o período" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">Diário</SelectItem>
+                            <SelectItem value="weekly">Semanal</SelectItem>
+                            <SelectItem value="monthly">Mensal</SelectItem>
+                            <SelectItem value="yearly">Anual</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="periodicityParcelledSplit"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field orientation="horizontal">
+                        <Checkbox
+                          id={field.name}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          defaultChecked={false}
+                        />
+                        <FieldLabel htmlFor={field.name}>
+                          Dividir entre as parcelas?
+                        </FieldLabel>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </div>
+              )}
             </FieldGroup>
           </CardContent>
         </Card>
