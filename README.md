@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⛪ GerminarApp
 
-## Getting Started
+SaaS de gestão para igrejas com suporte a estrutura multi-filial (matriz e congregações), desenvolvido com Next.js e TypeScript.
 
-First, run the development server:
+## 📋 Sobre o projeto
+
+O GerminarApp é uma plataforma de gestão eclesiástica que centraliza membros, famílias, grupos/ministérios e finanças de uma igreja e suas filiais em um único sistema, com controle de acesso baseado em papéis (RBAC) e arquitetura multi-tenant.
+
+## 🚀 Tecnologias utilizadas
+
+- **Frontend:** Next.js 14, React, TypeScript, Tailwind CSS
+- **UI:** shadcn-ui
+- **Backend:** Next.js (Server Actions) com Next Safe Action
+- **Banco de dados:** PostgreSQL
+- **ORM:** Drizzle ORM
+- **Autenticação:** Better Auth
+- **Validação de formulários:** Zod, React Hook Form
+
+## ✨ Funcionalidades
+
+- Arquitetura multi-tenant (banco compartilhado + `tenant_id` + RLS)
+- Controle de acesso baseado em papéis (RBAC)
+- Gestão de membros e famílias
+- Gestão de grupos e ministérios
+- Módulo financeiro completo:
+  - Lançamentos de entradas e saídas
+  - Conciliação bancária (importação OFX)
+  - Estrutura matriz/filial com transferências financeiras entre unidades
+  - Plano de contas
+- Estrutura de billing e notificações
+
+## 🔧 Como executar o projeto
 
 ```bash
+# Clonar o repositório
+git clone https://github.com/allanlimass/germinarapp.git
+cd germinarapp
+
+# Instalar dependências
+npm install
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+# Preencher com suas credenciais de banco de dados e demais serviços
+
+# Rodar as migrações do banco de dados
+npx drizzle-kit push
+
+# Iniciar o servidor de desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse `http://localhost:3000` no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👤 Autor
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Allan Silva**
+- LinkedIn: [linkedin.com/in/allanlimass](https://linkedin.com/in/allanlimass)
+- GitHub: [github.com/allanlimass](https://github.com/allanlimass)
 
-## Learn More
+## 📄 Licença
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este projeto está sob a licença MIT.
